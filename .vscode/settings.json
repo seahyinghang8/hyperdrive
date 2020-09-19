@@ -1,9 +1,0 @@
-{
-    "python.dataScience.jupyterServerURI": "local",
-    "python.linting.enabled": true,
-    "python.linting.pylintEnabled": false,
-    "python.linting.pycodestyleEnabled": true,
-    "python.linting.pycodestyleArgs": [
-        "--ignore=E303"
-    ]
-}
