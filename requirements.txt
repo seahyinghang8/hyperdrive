@@ -1,4 +1,7 @@
 pytesseract
 pdf2image
+numpy
+pandas
+# typechecking + linting
 mypy
 pycodestyle
