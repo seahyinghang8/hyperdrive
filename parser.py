@@ -12,7 +12,7 @@ except ImportError:
 
 def process_image(image: Image):
     tesseract_out = pytesseract.image_to_data(image)
-    print(parse_tesseract_data(tesseract_out))
+    return parse_tesseract_data(tesseract_out)
 
 
 def parse_tesseract_data(str) -> pd.DataFrame:
@@ -30,9 +30,12 @@ def parse_tesseract_data(str) -> pd.DataFrame:
         'width': width,
         'height': height
     })
+    df[["left", "top", "width", "height"]] = (
+        df[["left", "top", "width", "height"]].apply(pd.to_numeric)
+    )
     return df
 
 
 if __name__ == "__main__":
-    pdf_path = 'data/b.pdf'
+    pdf_path = '../w2/w2.pdf'
     process_image(pdf2image.convert_from_path(pdf_path)[0])
