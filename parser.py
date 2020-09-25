@@ -12,7 +12,7 @@ except ImportError:
 
 def process_image(image: Image):
     tesseract_out = pytesseract.image_to_data(image)
-    print(parse_tesseract_data(tesseract_out))
+    return parse_tesseract_data(tesseract_out)
 
 
 def parse_tesseract_data(str) -> pd.DataFrame:
