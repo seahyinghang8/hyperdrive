@@ -6,8 +6,7 @@ try:
 except ImportError:
     import Image
 
-from models.word import Word
-from models.line import Line
+from models.spatial_text import Line, Word
 
 
 def process_image(image: Image) -> List[Line]:
