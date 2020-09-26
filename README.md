@@ -14,4 +14,8 @@ To install poppler (PDF to image converter), run `brew install poppler`
 
 ## Typechecking
 
+To perform a basic typecheck, run `mypy file.py --ignore-missing-imports` where file.py is the program you are typechecking
+
+To perform a strict typecheck, run `mypy file.py --disallow-untyped-defs --ignore-missing-imports` to ensure all functions are typechecked.
+
 # Create makefile
