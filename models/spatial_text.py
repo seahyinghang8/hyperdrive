@@ -59,7 +59,7 @@ class Word(SpatialText):
         return self.text
 
     def __repr__(self) -> str:
-        return self.text
+        return "word(" + self.text + ")"
 
     def __len__(self) -> int:
         return len(self.text)
@@ -84,7 +84,7 @@ class Line(SpatialText):
         return ' '.join(self._word_to_str_list())
 
     def __repr__(self) -> str:
-        return ' '.join(self._word_to_str_list())
+        return "line(" + ' '.join(self._word_to_str_list()) + ")"
 
     def __len__(self) -> int:
         return len(self._words)
