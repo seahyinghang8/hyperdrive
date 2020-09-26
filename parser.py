@@ -9,12 +9,13 @@ except ImportError:
 from models.spatial_text import Line, Word
 
 
+# Process image using Tesseract OCR to get a list of Lines
 def process_image(image: Image) -> List[Line]:
     tesseract_out = pytesseract.image_to_data(image)
-    return parse_tesseract_data(tesseract_out)
+    return _parse_tesseract_data(tesseract_out)
 
 
-def parse_tesseract_data(data_str: str) -> List[Line]:
+def _parse_tesseract_data(data_str: str) -> List[Line]:
     # first line is a header, last line is empty
     output_lines = data_str.split('\n')[1:-1]
 
