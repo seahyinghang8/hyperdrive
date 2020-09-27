@@ -1,48 +1,141 @@
+from typing import List, Any
 import numpy as np
+from scipy import spatial
 try:
     from PIL import Image
 except ImportError:
     import Image
 
-import pdf2image
-from scipy import spatial
+from models.spatial_text import Line, Word
 
-from parser import process_image
 
 WORD_DIST_MULTIPLIER = 1.25
 
-def cluster_font(pdf_path):
-	image = pdf2image.convert_from_path(pdf_path)[0]
-	df = process_image(image)
 
-def cluster_font_size(word1, word2):
-	word1_width = word1['width'] / len(word1['word'])
-	word2_width = word2['width'] / len(word2['word'])
-	width_prop = min(word1_width, word2_width) / max(word1_width, word2_width)
-	height_prop = (
-		min(word1['height'], word2['height']) /
-		max(word1['height'], word2['height']))
-	return (width_prop + height_prop) / 2
+# Cluster the text together
+def cluster_text(lines: List[Line], image: Image) -> None:
+    line_clusters: List[Line] = _cluster_words(lines, image)
+    print(line_clusters)
 
-def cluster_color(image, word1, word2):
-	return 1. - spatial.distance.cosine(
-		get_color_hist(
-			image, word1['left'], word1['top'],
-			word1['height'], word1['width']),
-		get_color_hist(
-			image, word2['left'], word2['top'],
-			word2['height'], word2['width'])
-	)
 
-def get_color_hist(image, left, top, height, width):
-	mask = np.zeros((int(image.size[1]), int(image.size[0])))
-	mask[top: top+height, left: left+width] = np.ones((height, width))
-	return image.histogram(Image.fromarray(np.uint8(255*mask)))
+# Break up each line into multiple clustered lines
+def _cluster_words(lines: List[Line], image: Image) -> List[Line]:
+    params = {
+        'threshold': 0.5,
+        'position_weight': 0.5,
+        'font_size_weight': 0.5,
+        'color_weight': 0.
+    }
+
+    new_lines: List[List[Line]] = [
+        _split_line_into_clusters(line, image, params)
+        for line in lines
+    ]
+    return _flatten(new_lines)
+
+
+def _flatten(lst: List[List[Any]]) -> List[Any]:
+    return [item for sublist in lst for item in sublist]
+
+
+# Break up the line into clusters
+def _split_line_into_clusters(line: Line, image: Image,
+                              params: dict) -> List[Line]:
+
+    if len(line) == 1:
+        return [line]
+
+    first_words: List[Word] = line.words[:-1]
+    second_words: List[Word] = line.words[1:]
+    scores: List[float] = [
+        _score_word_overall(w1, w2, image, params)
+        for w1, w2 in zip(first_words, second_words)
+    ]
+    split_start: List[int] = [
+        i + 1 for i, s in enumerate(scores) if s < params['threshold']
+    ]
+    split_end: List[int] = list(split_start)
+    split_start.insert(0, 0)
+    split_end.append(len(line))
+    new_lines: List[Line] = [
+        Line(line.words[start:end])
+        for start, end in zip(split_start, split_end)
+    ]
+
+    return new_lines
+
+
+# Score P(word1, word2) belong together from [0, 1]
+def _score_word_overall(word1: Word,
+                        word2: Word,
+                        image: Image,
+                        params: dict) -> float:
+    pos_score = _score_word_position(word1, word2) * params['position_weight']
+    font_size_score = _score_word_font_size(word1, word2) * \
+        params['font_size_weight']
+    # color_score = _score_word_color(word1, word2, image) * \
+    #     params['color_weight']
+
+    overall_score = pos_score + font_size_score
+    return overall_score
+
+
+# Score P(word1, word2) are together using position
+def _score_word_position(word1: Word, word2: Word) -> float:
+    # high likelihood that w1 and w2 are from
+    # the same cluster if the dist < 2 * avg_width
+    # likelihood linearly decreases from 2x to 6x
+    avg_width: float = word1.mean_char_width
+    dist = word2.left - word1.right
+    if dist < 2 * avg_width:
+        return 1.
+    elif dist < 6 * avg_width:
+        frac = (dist - 2 * avg_width) / (4 * avg_width)
+        return 1. - frac
+    else:
+        return 0.
+
+
+# Score P(word1, word2) are together using font size
+def _score_word_font_size(word1: Word, word2: Word) -> float:
+    # high likelihood if w1 and w2 share similar sizes
+    width_ratio = word1.mean_char_width / word2.mean_char_width
+    height_ratio = word1.height / word2.height
+
+    if width_ratio > 1.:
+        width_ratio = 1. / width_ratio
+    if height_ratio > 1.:
+        height_ratio = 1. / height_ratio
+
+    return (width_ratio + height_ratio) / 2.
+
+
+# Score P(word1, word2) are together using color
+def _score_word_color(word1: Word, word2: Word, image: Image) -> float:
+    return 1. - spatial.distance.cosine(
+        _get_color_hist(
+            image, word1.left, word1.top,
+            word1.height, word1.width),
+        _get_color_hist(
+            image, word2.left, word2.top,
+            word2.height, word2.width)
+    )
+
+
+def _get_color_hist(image: Image,
+                    left: int, top: int,
+                    height: int, width: int) -> Any:
+    mask = np.zeros((int(image.size[1]), int(image.size[0])))
+    mask[top: top + height, left: left + width] = np.ones((height, width))
+    return image.histogram(Image.fromarray(np.uint8(255 * mask)))
 
 
 if __name__ == "__main__":
-    pdf_path = '../w2/w2.pdf'
-    cluster_font(pdf_path)
+    from parser import process_image
+    import pdf2image
 
+    pdf_path = 'data/w2/W2_Multi_Sample_Data_input_IRS2_clean_10414.pdf'
 
-
+    page_1_image = pdf2image.convert_from_path(pdf_path)[0]
+    lines = process_image(page_1_image)
+    cluster_text(lines, page_1_image)

@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Union
 
 
 # Definition of a Spatial Text class
@@ -37,6 +37,9 @@ class SpatialText:
         return self._width
 
 
+NEGATIVE_VAL_ERROR = "Expected attribute '{}' to be >= 0. Actual value: {}"
+
+
 # Definition of a Word class
 class Word(SpatialText):
     def __init__(self, text: str = '', confidence: int = 0,
@@ -68,6 +71,24 @@ class Word(SpatialText):
     def text(self) -> str:
         return self._text
 
+    @property
+    def mean_char_width(self) -> float:
+        return float(self.width) / len(self)
+
+
+class LineIterator:
+    def __init__(self, words: List[Word]):
+        self._words = words
+        self._index = 0
+
+    def __next__(self) -> Word:
+        if self._index >= len(self._words):
+            raise StopIteration
+
+        next_word = self._words[self._index]
+        self._index += 1
+        return next_word
+
 
 # Definition of a Line class
 class Line(SpatialText):
@@ -88,6 +109,12 @@ class Line(SpatialText):
 
     def __len__(self) -> int:
         return len(self._words)
+
+    def __getitem__(self, key: int) -> Word:
+        return self._words[key]
+
+    def __iter__(self) -> LineIterator:
+        return LineIterator(self._words)
 
     def _word_to_str_list(self) -> List[str]:
         return [str(w) for w in self._words]
