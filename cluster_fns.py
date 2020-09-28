@@ -9,13 +9,24 @@ except ImportError:
 from models.spatial_text import Line, Word
 
 
-WORD_DIST_MULTIPLIER = 1.25
-
-
 # Cluster the text together
 def cluster_text(lines: List[Line], image: Image) -> None:
     line_clusters: List[Line] = _cluster_words(lines, image)
-    print(line_clusters)
+    line_pos = [
+        ((line.left, i),
+         (line.top, i),
+         (line.right, i),
+         (line.bottom, i))
+        for i, line in enumerate(line_clusters)
+    ]
+    left_pos_t, top_pos_t, right_pos_t, bottom_pos_t = zip(*line_pos)
+
+    left_pos = sorted(left_pos_t, key=lambda x: x[0])
+    top_pos = sorted(top_pos_t, key=lambda x: x[0])
+    right_pos = sorted(right_pos_t, key=lambda x: x[0])
+    bottom_pos = sorted(bottom_pos_t, key=lambda x: x[0])
+
+    print(left_pos)
 
 
 # Break up each line into multiple clustered lines
@@ -39,8 +50,11 @@ def _flatten(lst: List[List[Any]]) -> List[Any]:
 
 
 # Break up the line into clusters
-def _split_line_into_clusters(line: Line, image: Image,
-                              params: dict) -> List[Line]:
+def _split_line_into_clusters(
+    line: Line,
+    image: Image,
+    params: dict
+) -> List[Line]:
 
     if len(line) == 1:
         return [line]
@@ -66,10 +80,12 @@ def _split_line_into_clusters(line: Line, image: Image,
 
 
 # Score P(word1, word2) belong together from [0, 1]
-def _score_word_overall(word1: Word,
-                        word2: Word,
-                        image: Image,
-                        params: dict) -> float:
+def _score_word_overall(
+    word1: Word,
+    word2: Word,
+    image: Image,
+    params: dict
+) -> float:
     pos_score = _score_word_position(word1, word2) * params['position_weight']
     font_size_score = _score_word_font_size(word1, word2) * \
         params['font_size_weight']
@@ -122,9 +138,13 @@ def _score_word_color(word1: Word, word2: Word, image: Image) -> float:
     )
 
 
-def _get_color_hist(image: Image,
-                    left: int, top: int,
-                    height: int, width: int) -> Any:
+def _get_color_hist(
+    image: Image,
+    left: int,
+    top: int,
+    height: int,
+    width: int
+) -> Any:
     mask = np.zeros((int(image.size[1]), int(image.size[0])))
     mask[top: top + height, left: left + width] = np.ones((height, width))
     return image.histogram(Image.fromarray(np.uint8(255 * mask)))
