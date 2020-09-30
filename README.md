@@ -1,6 +1,6 @@
 # hyperdrive
 
-The foundational structure to an automated filesystem
+The foundational structure for an automated filesystem
 
 Python version 3.7.8
 
@@ -14,8 +14,8 @@ To install poppler (PDF to image converter), run `brew install poppler`
 
 ## Typechecking
 
-To perform a basic typecheck, run `mypy file.py --ignore-missing-imports` where file.py is the program you are typechecking
+To perform a strict typecheck, run `mypy . --disallow-untyped-defs --ignore-missing-imports` to ensure all functions are typechecked.
 
-To perform a strict typecheck, run `mypy file.py --disallow-untyped-defs --ignore-missing-imports` to ensure all functions are typechecked.
+# Test
 
-# Create makefile
+Run `python main.py` to test the algorithm

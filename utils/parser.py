@@ -44,12 +44,3 @@ def _parse_tesseract_data(data_str: str) -> List[Line]:
         )
         curr_line.append(new_word)
     return lines
-
-
-
-if __name__ == "__main__":
-    import pdf2image
-
-    pdf_path = 'data/receipts/Receipt Jun 23, 2020.pdf'
-    lines = process_image(pdf2image.convert_from_path(pdf_path)[0])
-    print(lines)

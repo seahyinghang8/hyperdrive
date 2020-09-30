@@ -7,15 +7,13 @@ except ImportError:
     import Image
 
 from models.spatial_text import Line, Word
-
-
-WORD_DIST_MULTIPLIER = 1.25
+from utils.helpers import flatten
 
 
 # Cluster the text together
-def cluster_text(lines: List[Line], image: Image) -> None:
+def cluster_text(lines: List[Line], image: Image) -> List[Line]:
     line_clusters: List[Line] = _cluster_words(lines, image)
-    print(line_clusters)
+    return line_clusters
 
 
 # Break up each line into multiple clustered lines
@@ -31,16 +29,15 @@ def _cluster_words(lines: List[Line], image: Image) -> List[Line]:
         _split_line_into_clusters(line, image, params)
         for line in lines
     ]
-    return _flatten(new_lines)
-
-
-def _flatten(lst: List[List[Any]]) -> List[Any]:
-    return [item for sublist in lst for item in sublist]
+    return flatten(new_lines)
 
 
 # Break up the line into clusters
-def _split_line_into_clusters(line: Line, image: Image,
-                              params: dict) -> List[Line]:
+def _split_line_into_clusters(
+    line: Line,
+    image: Image,
+    params: dict
+) -> List[Line]:
 
     if len(line) == 1:
         return [line]
@@ -66,10 +63,12 @@ def _split_line_into_clusters(line: Line, image: Image,
 
 
 # Score P(word1, word2) belong together from [0, 1]
-def _score_word_overall(word1: Word,
-                        word2: Word,
-                        image: Image,
-                        params: dict) -> float:
+def _score_word_overall(
+    word1: Word,
+    word2: Word,
+    image: Image,
+    params: dict
+) -> float:
     pos_score = _score_word_position(word1, word2) * params['position_weight']
     font_size_score = _score_word_font_size(word1, word2) * \
         params['font_size_weight']
@@ -122,20 +121,13 @@ def _score_word_color(word1: Word, word2: Word, image: Image) -> float:
     )
 
 
-def _get_color_hist(image: Image,
-                    left: int, top: int,
-                    height: int, width: int) -> Any:
+def _get_color_hist(
+    image: Image,
+    left: int,
+    top: int,
+    height: int,
+    width: int
+) -> Any:
     mask = np.zeros((int(image.size[1]), int(image.size[0])))
     mask[top: top + height, left: left + width] = np.ones((height, width))
     return image.histogram(Image.fromarray(np.uint8(255 * mask)))
-
-
-if __name__ == "__main__":
-    from parser import process_image
-    import pdf2image
-
-    pdf_path = 'data/w2/W2_Multi_Sample_Data_input_IRS2_clean_10414.pdf'
-
-    page_1_image = pdf2image.convert_from_path(pdf_path)[0]
-    lines = process_image(page_1_image)
-    cluster_text(lines, page_1_image)

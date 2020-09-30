@@ -1,4 +1,9 @@
-from typing import List, Optional, Union
+from typing import List, Tuple, Optional
+
+try:
+    from PIL import Image
+except ImportError:
+    import Image
 
 
 # Definition of a Spatial Text class
@@ -35,6 +40,14 @@ class SpatialText:
     @property
     def width(self) -> int:
         return self._width
+
+    @property
+    def center_left(self) -> int:
+        return int(self.left + self.width / 2)
+    
+    @property
+    def center_top(self) -> int:
+        return int(self.top + self.height / 2)
 
 
 NEGATIVE_VAL_ERROR = "Expected attribute '{}' to be >= 0. Actual value: {}"
@@ -138,7 +151,130 @@ class Line(SpatialText):
             self._width = max([w.right - self.left for w in self._words])
             self._height = max([w.bottom - self.top for w in self._words])
 
-
     @property
     def words(self) -> List[Word]:
         return self._words
+
+
+class BlockIterator:
+    def __init__(self, lines: List[Line]):
+        self._lines = lines
+        self._index = 0
+
+    def __next__(self) -> Line:
+        if self._index >= len(self._lines):
+            raise StopIteration
+
+        next_line = self._lines[self._index]
+        self._index += 1
+        return next_line
+
+
+# Definition of a Block class
+class Block(SpatialText):
+    def __init__(self, lines: List[Line]):
+        super().__init__(0, 0, 0, 0)
+        self._lines: List[Line] = lines
+        self._compute_spatial_metadata()
+
+    def append(self, new_line: Line) -> None:
+        self._lines.append(new_line)
+        self._compute_spatial_metadata(new_line)
+
+    def __str__(self) -> str:
+        return ' '.join(self._line_to_str_list())
+
+    def __repr__(self) -> str:
+        return "block(" + ' '.join(self._line_to_str_list()) + ")"
+
+    def __len__(self) -> int:
+        return len(self._lines)
+
+    def __getitem__(self, key: int) -> Line:
+        return self._lines[key]
+
+    def __iter__(self) -> BlockIterator:
+        return BlockIterator(self._lines)
+
+    def _line_to_str_list(self) -> List[str]:
+        return [str(line) for line in self._lines]
+
+    def _compute_spatial_metadata(
+        self,
+        new_line: Optional[Line] = None
+    ) -> None:
+        if len(self._lines) == 0:
+            return
+
+        # ensure that all the spatial metadata are initialized
+        if new_line and len(self._lines) > 1:
+            self._left = min(self._left, new_line.left)
+            self._top = min(self._top, new_line.top)
+            self._width = max(self._width, new_line.right - self.left)
+            self._height = max(self._height, new_line.bottom - self.top)
+        else:
+            self._left = min([w.left for w in self._lines])
+            self._top = min([w.top for w in self._lines])
+            self._width = max([w.right - self.left for w in self._lines])
+            self._height = max([w.bottom - self.top for w in self._lines])
+
+    @property
+    def lines(self) -> List[Line]:
+        return self._lines
+
+
+# Definition of a Page class
+class Page(SpatialText):
+    def __init__(self, lines: List[Line], image: Image):
+        super().__init__(0, 0, 0, 0)
+        self._lines = lines
+        self._image = image
+        self._compute_page_metadata()
+        self._compute_spatial_metadata()
+
+    def _compute_spatial_metadata(self) -> None:
+        if len(self._lines) == 0:
+            return
+
+        # ensure that all the spatial metadata are initialized
+        self._left = min([ln.left for ln in self._lines])
+        self._top = min([ln.top for ln in self._lines])
+        self._width = max([ln.right - self.left for ln in self._lines])
+        self._height = max([ln.bottom - self.top for ln in self._lines])
+
+    def _compute_page_metadata(self) -> None:
+        self._left_pos: List[Tuple[int, int]]
+        self._top_pos: List[Tuple[int, int]]
+        self._right_pos: List[Tuple[int, int]]
+        self._bottom_pos: List[Tuple[int, int]]
+
+        line_pos = [
+            ((line.left, i),
+             (line.top, i),
+             (line.right, i),
+             (line.bottom, i))
+            for i, line in enumerate(self._lines)
+        ]
+        left_pos_t, top_pos_t, right_pos_t, bottom_pos_t = zip(*line_pos)
+
+        self._left_pos = sorted(left_pos_t, key=lambda x: x[0])
+        self._top_pos = sorted(top_pos_t, key=lambda x: x[0])
+        self._right_pos = sorted(right_pos_t, key=lambda x: x[0])
+        self._bottom_pos = sorted(bottom_pos_t, key=lambda x: x[0])
+
+    def __getitem__(self, key: int) -> Line:
+        return self._lines[key]
+
+    def __repr__(self) -> str:
+        return f"<Page with {len(self)} line(s)>"
+
+    def __len__(self) -> int:
+        return len(self._lines)
+
+    @property
+    def lines(self) -> List[Line]:
+        return self._lines
+
+    @property
+    def image(self) -> Image:
+        return self._image
