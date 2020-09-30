@@ -7,26 +7,13 @@ except ImportError:
     import Image
 
 from models.spatial_text import Line, Word
+from utils.helpers import flatten
 
 
 # Cluster the text together
-def cluster_text(lines: List[Line], image: Image) -> None:
+def cluster_text(lines: List[Line], image: Image) -> List[Line]:
     line_clusters: List[Line] = _cluster_words(lines, image)
-    line_pos = [
-        ((line.left, i),
-         (line.top, i),
-         (line.right, i),
-         (line.bottom, i))
-        for i, line in enumerate(line_clusters)
-    ]
-    left_pos_t, top_pos_t, right_pos_t, bottom_pos_t = zip(*line_pos)
-
-    left_pos = sorted(left_pos_t, key=lambda x: x[0])
-    top_pos = sorted(top_pos_t, key=lambda x: x[0])
-    right_pos = sorted(right_pos_t, key=lambda x: x[0])
-    bottom_pos = sorted(bottom_pos_t, key=lambda x: x[0])
-
-    print(left_pos)
+    return line_clusters
 
 
 # Break up each line into multiple clustered lines
@@ -42,11 +29,7 @@ def _cluster_words(lines: List[Line], image: Image) -> List[Line]:
         _split_line_into_clusters(line, image, params)
         for line in lines
     ]
-    return _flatten(new_lines)
-
-
-def _flatten(lst: List[List[Any]]) -> List[Any]:
-    return [item for sublist in lst for item in sublist]
+    return flatten(new_lines)
 
 
 # Break up the line into clusters
@@ -148,14 +131,3 @@ def _get_color_hist(
     mask = np.zeros((int(image.size[1]), int(image.size[0])))
     mask[top: top + height, left: left + width] = np.ones((height, width))
     return image.histogram(Image.fromarray(np.uint8(255 * mask)))
-
-
-if __name__ == "__main__":
-    from parser import process_image
-    import pdf2image
-
-    pdf_path = 'data/w2/W2_Multi_Sample_Data_input_IRS2_clean_10414.pdf'
-
-    page_1_image = pdf2image.convert_from_path(pdf_path)[0]
-    lines = process_image(page_1_image)
-    cluster_text(lines, page_1_image)

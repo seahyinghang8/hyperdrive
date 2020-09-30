@@ -1,4 +1,9 @@
-from typing import List, Optional, Union
+from typing import List, Tuple, Optional
+
+try:
+    from PIL import Image
+except ImportError:
+    import Image
 
 
 # Definition of a Spatial Text class
@@ -35,6 +40,14 @@ class SpatialText:
     @property
     def width(self) -> int:
         return self._width
+
+    @property
+    def center_left(self) -> int:
+        return int(self.left + self.width / 2)
+    
+    @property
+    def center_top(self) -> int:
+        return int(self.top + self.height / 2)
 
 
 NEGATIVE_VAL_ERROR = "Expected attribute '{}' to be >= 0. Actual value: {}"
@@ -208,3 +221,60 @@ class Block(SpatialText):
     @property
     def lines(self) -> List[Line]:
         return self._lines
+
+
+# Definition of a Page class
+class Page(SpatialText):
+    def __init__(self, lines: List[Line], image: Image):
+        super().__init__(0, 0, 0, 0)
+        self._lines = lines
+        self._image = image
+        self._compute_page_metadata()
+        self._compute_spatial_metadata()
+
+    def _compute_spatial_metadata(self) -> None:
+        if len(self._lines) == 0:
+            return
+
+        # ensure that all the spatial metadata are initialized
+        self._left = min([ln.left for ln in self._lines])
+        self._top = min([ln.top for ln in self._lines])
+        self._width = max([ln.right - self.left for ln in self._lines])
+        self._height = max([ln.bottom - self.top for ln in self._lines])
+
+    def _compute_page_metadata(self) -> None:
+        self._left_pos: List[Tuple[int, int]]
+        self._top_pos: List[Tuple[int, int]]
+        self._right_pos: List[Tuple[int, int]]
+        self._bottom_pos: List[Tuple[int, int]]
+
+        line_pos = [
+            ((line.left, i),
+             (line.top, i),
+             (line.right, i),
+             (line.bottom, i))
+            for i, line in enumerate(self._lines)
+        ]
+        left_pos_t, top_pos_t, right_pos_t, bottom_pos_t = zip(*line_pos)
+
+        self._left_pos = sorted(left_pos_t, key=lambda x: x[0])
+        self._top_pos = sorted(top_pos_t, key=lambda x: x[0])
+        self._right_pos = sorted(right_pos_t, key=lambda x: x[0])
+        self._bottom_pos = sorted(bottom_pos_t, key=lambda x: x[0])
+
+    def __getitem__(self, key: int) -> Line:
+        return self._lines[key]
+
+    def __repr__(self) -> str:
+        return f"<Page with {len(self)} line(s)>"
+
+    def __len__(self) -> int:
+        return len(self._lines)
+
+    @property
+    def lines(self) -> List[Line]:
+        return self._lines
+
+    @property
+    def image(self) -> Image:
+        return self._image
