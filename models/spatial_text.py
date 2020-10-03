@@ -276,5 +276,13 @@ class Page(SpatialText):
         return self._lines
 
     @property
+    def left_pos(self) -> List[Tuple[int, int]]:
+        return self._left_pos
+
+    @property
+    def top_pos(self) -> List[Tuple[int, int]]:
+        return self._top_pos
+
+    @property
     def image(self) -> Image:
         return self._image
