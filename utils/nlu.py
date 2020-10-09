@@ -23,5 +23,5 @@ def get_entity_scores(
 def fuzzy_word_equal(
     word1: str,
     word2: str
-) -> int:
+) -> float:
     return fuzz.ratio(word1.lower(), word2.lower()) / 100.
