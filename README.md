@@ -12,6 +12,8 @@ To install tesseract (OCR engine), run `brew install tesseract`
 
 To install poppler (PDF to image converter), run `brew install poppler`
 
+To install the spacy model, run `python -m spacy download en_core_web_sm`
+
 ## Typechecking
 
 To perform a strict typecheck, run `mypy . --disallow-untyped-defs --ignore-missing-imports` to ensure all functions are typechecked.

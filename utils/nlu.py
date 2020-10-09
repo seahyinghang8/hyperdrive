@@ -1,8 +1,9 @@
 from collections import defaultdict
+from typing import DefaultDict
 
 import spacy
 from spacy.lang.en import English
-from typing import DefaultDict
+from rapidfuzz import fuzz
 
 def get_entity_scores(
     nlp: English,

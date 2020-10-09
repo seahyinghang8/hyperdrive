@@ -3,6 +3,7 @@ pdf2image
 numpy
 pandas
 scipy
+spacy
 # typechecking + linting
 mypy
 pycodestyle
