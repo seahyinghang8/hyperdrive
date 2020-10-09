@@ -6,3 +6,4 @@ scipy
 # typechecking + linting
 mypy
 pycodestyle
+rapidfuzz
