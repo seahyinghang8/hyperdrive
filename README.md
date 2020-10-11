@@ -1,4 +1,4 @@
-# hyperdrive
+# Hyperdrive
 
 The foundational structure for an automated filesystem
 
@@ -18,6 +18,6 @@ To install the spacy model, run `python -m spacy download en_core_web_sm`
 
 To perform a strict typecheck, run `mypy . --disallow-untyped-defs --ignore-missing-imports` to ensure all functions are typechecked.
 
-# Test
+## Test
 
 Run `python main.py` to test the algorithm
