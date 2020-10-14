@@ -149,6 +149,7 @@ def _score_entity(
             score = max(score, entity_score)
     return score
 
+
 def _get_word_scores(
     line_idxs: List[int],
     lines: List[Line],
@@ -160,6 +161,7 @@ def _get_word_scores(
             word_scores[i] = max(
                 word_scores[i], fuzzy_word_equal(wn, str(lines[line_idx])))
     return sum(word_scores) / len(word_scores)
+
 
 def _score_near_words(
     line: Line,
