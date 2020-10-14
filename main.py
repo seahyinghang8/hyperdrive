@@ -2,6 +2,7 @@ from utils.parser import process_image
 from utils.cluster import cluster_text
 from utils.extract import extract_fields
 from utils.dataloader import Dataloader
+from utils.evaluator import evaluate_output
 
 import os
 
@@ -12,10 +13,9 @@ if __name__ == "__main__":
     label_path = os.path.join(w2_sample_dir, 'single_label.csv')
 
     dl = Dataloader(data_dir, label_path)
-    pdf_doc = dl.get_document(0)
     field_queries = [
         {   # Field 1
-            "name": "Employer Identification Number",
+            "name": "EIN",
             "arguments": {
                 "x-position": 0.1,
                 "y-position": 0.1,
@@ -32,7 +32,7 @@ if __name__ == "__main__":
             }
         },
         {   # Field 2
-            "name": "Medicare Tax Witheld",
+            "name": "Medicare Tax withheld",
             "arguments": {
                 "x-position": 0.9,
                 "y-position": 0.1,
@@ -49,8 +49,12 @@ if __name__ == "__main__":
             }
         },
     ]
-    fields = extract_fields(pdf_doc, field_queries)
 
-    print("---- Extracted Fields ----")
-    for name, val_list in fields.items():
-        print(f"{name}: {val_list}")
+    num_docs = 4
+    extracted_fields = [
+        extract_fields(dl.get_document(i), field_queries)
+        for i in range(num_docs)
+    ]
+    labels = [dl.get_label(i) for i in range(num_docs)]
+    evaluate_output(extracted_fields,
+                    labels, ['EIN', 'Medicare Tax withheld'], 0.2)
