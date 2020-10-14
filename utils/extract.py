@@ -2,7 +2,7 @@ import spacy
 from spacy.lang.en import English
 
 from bisect import bisect
-from typing import List, Tuple, Dict
+from typing import List, Tuple, Dict, Set
 
 from models.spatial_text import Page, Line
 from models.document import Document
@@ -151,7 +151,7 @@ def _score_entity(
 
 
 def _get_word_scores(
-    line_idxs: List[int],
+    line_idxs: Set[int],
     lines: List[Line],
     word_neighbors: List[str]
 ) -> float:
@@ -176,10 +176,14 @@ def _score_near_words(
     valid_top_lines = set([])
     j = 1
 
-    def _get_comp_left_dist(idx):
+    def _get_comp_left_dist(
+        idx: int
+    ) -> int:
         return abs(line.left - page.left_pos[idx][0])
 
-    def _get_comp_top_dist(idx):
+    def _get_comp_top_dist(
+        idx: int
+    ) -> int:
         return abs(line.top - page.top_pos[idx][0])
 
     while True:
