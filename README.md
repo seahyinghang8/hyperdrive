@@ -21,7 +21,7 @@ Create a folder `data/` in the project root folder and unzip the contents of the
 
 ## Typechecking
 
-To perform a strict typecheck, run `mypy . --disallow-untyped-defs --ignore-missing-imports` to ensure all functions are typechecked.
+To perform a strict typecheck, run `mypy main.py --disallow-untyped-defs --ignore-missing-imports` to ensure all functions are typechecked.
 
 ## Test
 
