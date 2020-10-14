@@ -11,48 +11,12 @@ from utils.helpers import flatten
 from utils.nlu import get_entity_scores, fuzzy_word_equal
 
 
-def extract_fields(doc: Document) -> Dict[str, List[ExtractedField]]:
-    nlp = spacy.load("en_core_web_sm")
-    field_queries = [
-        {   # Field 1
-            "name": "Employer Identification Number",
-            "arguments": {
-                "x-position": 0.1,
-                "y-position": 0.1,
-                "entity": "CARDINAL",
-                "word-neighbors": ["Employer", "Identification", "Number"],
-                "word-neighbor-top-thres": 50,
-                "word-neighbor-left-thres": 200,
-            },
-            "weights": {
-                "x-position": 0.5,
-                "y-position": 0.2,
-                "entity": 0.5,
-                "word-neighbors": 0.2,
-            }
-        },
-        {   # Field 2
-            "name": "Medicare Tax Witheld",
-            "arguments": {
-                "x-position": 0.9,
-                "y-position": 0.1,
-                "entity": "CARDINAL",
-                "word-neighbors": ["Medicare", "Tax", "Withheld"],
-                "word-neighbor-top-thres": 50,
-                "word-neighbor-left-thres": 200,
-            },
-            "weights": {
-                "x-position": 0.2,
-                "y-position": 0.4,
-                "entity": 0.5,
-                "word-neighbors": 0.2,
-            }
-        },
-    ]
-    # TODO: will be replaced from a hardcoded variable
-    #       to an argument to the function
-    # TODO: maybe replace the field query to be an object
+def extract_fields(
+    doc: Document,
+    field_queries: List[dict]
+) -> Dict[str, List[ExtractedField]]:
 
+    nlp = spacy.load("en_core_web_sm")
     # iterate through all the pages
     top_k_fields_from_pages = [
         _get_top_k_fields_from_page(pg, field_queries, nlp, 2)
@@ -167,6 +131,7 @@ def _score_y_position(
     line_y = (line.center_top - page.top) / page.height
     return 1. - abs(line_y - position)
 
+
 def _score_entity(
     line: Line,
     nlp: English,
@@ -208,6 +173,7 @@ def _score_near_words(
     valid_left_lines = set([])
     valid_top_lines = set([])
     j = 1
+
     def _get_comp_left_dist(idx):
         return abs(line.left - page.left_pos[idx][0])
 
@@ -219,11 +185,11 @@ def _score_near_words(
         upper_idx = left_idx + j
         exceeded = True
         if (lower_idx > 0 and
-            _get_comp_left_dist(lower_idx) < left_thres):
+                _get_comp_left_dist(lower_idx) < left_thres):
             valid_left_lines.add(page.left_pos[lower_idx][1])
             exceeded = False
         if (upper_idx < len(page.lines) and 
-                 _get_comp_left_dist(upper_idx) < left_thres):
+                _get_comp_left_dist(upper_idx) < left_thres):
             valid_left_lines.add(page.left_pos[upper_idx][1])
             exceeded = False
         if exceeded:
@@ -236,11 +202,11 @@ def _score_near_words(
         upper_idx = top_idx + j
         exceeded = True
         if (lower_idx > 0 and
-            _get_comp_top_dist(lower_idx) < top_thres):
+                _get_comp_top_dist(lower_idx) < top_thres):
             valid_top_lines.add(page.top_pos[lower_idx][1])
             exceeded = False
         if (upper_idx < len(page.lines) and
-                 _get_comp_top_dist(upper_idx) < top_thres):
+                _get_comp_top_dist(upper_idx) < top_thres):
             valid_top_lines.add(page.top_pos[upper_idx][1])
             exceeded = False
         if exceeded:
