@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import DefaultDict
+from typing import DefaultDict, Tuple
 
 import spacy
 from spacy.lang.en import English
@@ -11,7 +11,7 @@ def get_entity_scores(
     doc: spacy.tokens.doc.Doc,
     beam_width: int = 16,
     beam_density: float = 0.0001
-) -> DefaultDict[str, float]:
+) -> DefaultDict[Tuple[int, int, str], float]:
     # calculate NER confidence score using method in this discussion:
     # https://support.prodi.gy/t/displaying-a-confidence-score-next-to-a-user-defined-entity/403/6
     beams = nlp.entity.beam_parse([doc],
