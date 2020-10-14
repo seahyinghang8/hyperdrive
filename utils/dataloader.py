@@ -49,7 +49,7 @@ class Dataloader:
                     images = pdf2image.convert_from_path(path)
                 else:
                     raise ValueError(f'Extension {ext} is not accepted.')
-                return {'images': images, 'label': label}
+                return {'images': images, 'label': label, 'filename': basename + '.' + ext}
 
         raise ValueError(f'file with basename {basename}\
             ({"|".join(self._extensions)}) cannot be found')
@@ -65,8 +65,7 @@ class Dataloader:
                 image=page_image
             ) for page_image in data['images']
         ]
-
-        data['document'] = Document(pdf_pages)
+        data['document'] = Document(data['filename'], pdf_pages)
         self._cache[idx] = data
 
         return data['document']
