@@ -4,8 +4,7 @@ numpy
 pandas
 scipy
 spacy
+rapidfuzz
 # typechecking + linting
 mypy
 pycodestyle
-rapidfuzz
-jupyterlab
