@@ -1,0 +1,6 @@
+recursive-include hyperwidget/static *.*
+include hyperwidget.json
+
+include LICENSE
+include setup.py
+include pyproject.toml
