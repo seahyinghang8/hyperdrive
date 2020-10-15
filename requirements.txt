@@ -8,3 +8,4 @@ spacy
 mypy
 pycodestyle
 rapidfuzz
+jupyterlab
