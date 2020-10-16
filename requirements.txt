@@ -1,3 +1,9 @@
+# typechecking + linting
+mypy
+pycodestyle
+# jupyter
+jupyter
+# dependencies
 pytesseract
 pdf2image
 numpy
@@ -5,6 +11,3 @@ pandas
 scipy
 spacy
 rapidfuzz
-# typechecking + linting
-mypy
-pycodestyle
