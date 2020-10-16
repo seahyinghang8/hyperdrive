@@ -11,14 +11,16 @@ from models.spatial_text import Page, Line
 
 TEXT_OFFSET = 0.1
 
+
 def get_ocr_viz(
     page: Page
 ) -> Image:
-    ocr_img = Image.new("RGBA", page.image.size, (255,255,255))
+    ocr_img = Image.new("RGBA", page.image.size, (255, 255, 255))
     canvas = ImageDraw.Draw(ocr_img)
     for line in page.lines:
         line_txt = str(line)
-        canvas.rectangle([line.left, line.top, line.right, line.bottom], outline=(0, 0, 0))
+        canvas.rectangle(
+            [line.left, line.top, line.right, line.bottom], outline=(0, 0, 0))
         font_size = min(line.height, int(line.width / len(line_txt)))
         canvas.text(
             (
@@ -26,10 +28,15 @@ def get_ocr_viz(
                 line.center_top - font_size / 2
             ),
             line_txt,
-            font=ImageFont.truetype("/Library/Fonts/Arial.ttf", font_size, encoding='UTF-8'),
+            font=ImageFont.truetype(
+                "/Library/Fonts/Arial.ttf",
+                font_size,
+                encoding='UTF-8'
+            ),
             fill=(0, 0, 0)
         )
     ocr_img.show()
+
 
 if __name__ == "__main__":
     pdf_path = "../w2/w2.pdf"
