@@ -27,13 +27,13 @@ To install the spacy model, run the following:
 python -m spacy download en_core_web_sm
 ```
 
-To install the jupyter widget, first ensure you have `npm` installed. Next, run the following:
+<!-- To install the jupyter widget, first ensure you have `npm` installed. Next, run the following:
 ```
 cd tools/hyperwidget
 pip install -e .
 jupyter nbextension install --py --symlink --sys-prefix hyperwidget
 jupyter nbextension enable --py --sys-prefix hyperwidget
-```
+``` -->
 
 ## Sample Data
 
@@ -54,7 +54,7 @@ To test the code on an example, run
 python main.py
 ```
 
-You can also test hyperwidget on the jupyter notebook by running
+To test the code on a jupyter notebook, run
 ```
 jupyter notebook
 ```
