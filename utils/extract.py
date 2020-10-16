@@ -30,6 +30,7 @@ def extract_fields(
     return extracted_fields
 
 
+
 def _get_top_k_fields_from_page(
     page: Page,
     field_queries: List[dict],
@@ -167,35 +168,43 @@ def _score_near_words(
     line: Line,
     page: Page,
     word_neighbors: List[str],
-    top_thres: float,
-    left_thres: float
+    norm_top_thres: float,
+    norm_left_thres: float
 ) -> float:
+    valid_line_idxs = get_nearby_words(
+        line, page, norm_top_thres, norm_left_thres)
+    return _get_word_scores(
+        valid_line_idxs, page.lines, word_neighbors)
+
+def get_nearby_words(
+    line: Line,
+    page: Page,
+    norm_top_thres: float,
+    norm_left_thres: float
+) -> Set[int]:
     left_idx = bisect(page.left_pos, (line.left,))
     top_idx = bisect(page.top_pos, (line.top,))
     valid_left_lines = set([])
     valid_top_lines = set([])
     j = 1
-
-    def _get_comp_left_dist(
-        idx: int
-    ) -> int:
+    def _get_comp_left_dist(idx: int) -> int:
         return abs(line.left - page.left_pos[idx][0])
 
-    def _get_comp_top_dist(
-        idx: int
-    ) -> int:
+    def _get_comp_top_dist(idx: int) -> int:
         return abs(line.top - page.top_pos[idx][0])
 
+    left_thres = norm_left_thres * page.width
+    top_thres = norm_top_thres * page.height
     while True:
         lower_idx = left_idx - j
         upper_idx = left_idx + j
         exceeded = True
         if (lower_idx > 0 and
-                _get_comp_left_dist(lower_idx) < left_thres):
+            _get_comp_left_dist(lower_idx) < left_thres):
             valid_left_lines.add(page.left_pos[lower_idx][1])
             exceeded = False
         if (upper_idx < len(page.lines) and 
-                _get_comp_left_dist(upper_idx) < left_thres):
+                 _get_comp_left_dist(upper_idx) < left_thres):
             valid_left_lines.add(page.left_pos[upper_idx][1])
             exceeded = False
         if exceeded:
@@ -208,7 +217,7 @@ def _score_near_words(
         upper_idx = top_idx + j
         exceeded = True
         if (lower_idx > 0 and
-                _get_comp_top_dist(lower_idx) < top_thres):
+            _get_comp_top_dist(lower_idx) < top_thres):
             valid_top_lines.add(page.top_pos[lower_idx][1])
             exceeded = False
         if (upper_idx < len(page.lines) and
@@ -218,6 +227,4 @@ def _score_near_words(
         if exceeded:
             break
         j += 1
-
-    valid_line_idxs = valid_left_lines & valid_top_lines
-    return _get_word_scores(valid_line_idxs, page.lines, word_neighbors)
+    return valid_left_lines & valid_top_lines
