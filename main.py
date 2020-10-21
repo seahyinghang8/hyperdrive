@@ -57,4 +57,4 @@ if __name__ == "__main__":
     ]
     labels = [dl.get_label(i) for i in range(num_docs)]
     evaluate_output(extracted_fields,
-                    labels, ['EIN', 'Medicare Tax withheld'], 0.2)
+                    labels, ['EIN', 'Medicare Tax withheld'])

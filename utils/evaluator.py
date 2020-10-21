@@ -7,8 +7,7 @@ from models.field import ExtractedField
 def evaluate_output(
     extracted_fields: List[dict],
     ground_truths: List[dict],
-    fields: List[str],
-    error_tolerance: float = 0.0
+    fields: List[str]
 ) -> None:
     # error_tolerance [0., 1.] where 0. means no room for error
     # 0.5 means 50% of the algorithm have to match the true label
@@ -18,17 +17,16 @@ def evaluate_output(
             for d in extracted_fields
         ]
         labels = [str(d[field]) if field in d else '' for d in ground_truths]
-        accuracy = compute_accuracy(outputs, labels, error_tolerance)
+        accuracy = compute_accuracy(outputs, labels)
         print(f"Field: {field}\tAccuracy: {accuracy}")
 
 
 def compute_accuracy(
     outputs: List[str],
-    labels: List[str],
-    error_tolerance: float
+    labels: List[str]
 ) -> float:
     match = [
-        fuzz.ratio(output, label) >= (1. - error_tolerance)
+        output == label
         for output, label in zip(outputs, labels)
     ]
     return sum(match) / len(labels)
