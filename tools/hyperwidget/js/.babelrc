@@ -1,0 +1,12 @@
+{
+    "presets": [
+      [
+        "@babel/preset-react",
+        {
+          "useBuiltIns": "usage",
+          "corejs": 3,
+          "modules": false
+        }
+      ]
+    ]
+  }
