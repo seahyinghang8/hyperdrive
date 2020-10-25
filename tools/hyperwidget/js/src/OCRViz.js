@@ -1,6 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'
+import { Tab, Tabs, TabList, TabPanel } from 'react-tabs'
+import 'react-tabs/style/react-tabs.css';
+
+import ReactTooltip from 'react-tooltip';
 
 const FONT_SIZE_SCALE = 0.9
+const TAB_OFFSET = 44
 
 class OCRViz extends React.Component {
     constructor(props) {
@@ -27,30 +32,69 @@ class OCRViz extends React.Component {
             this.props.model.save_changes();
         }
     }
-    render () {
+    componentDidMount () {
+        ReactTooltip.rebuild();
+    }
+    renderTab(showImg, showLines) {
+        ReactTooltip.rebuild();
         return (
-            <div style={getParentStyle(this.props.model.get('page'))}>
+            <div style={getParentStyle(this.props.model.get('page'), showImg)}>
                 {
-                    this.props.model.get('page').lines.map((line, index) => {
+                    showLines && this.props.model.get('page').lines.map((line, index) => {
                         return (
                             <div onClick={ this.getLineClickHandler(index).bind(this) }
+                                data-tip={line.text}
+                                data-for="preview"
                                 style={ getLineStyle(this.state.lineIdx.includes(index), line) }>
                                 {line.text}
                             </div>
                         )
                     })
                 }
+                <ReactTooltip id="preview"/>
             </div>
         )
     }
+    render () {
+        return (
+            <Tabs>
+                <TabList>
+                    <Tab>OCR</Tab>
+                    <Tab>Image</Tab>
+                    <Tab>OCR + Image</Tab>
+                </TabList>
+
+                <TabPanel>
+                    <div>
+                        {this.renderTab(false, true)}
+                    </div>
+                </TabPanel>
+                <TabPanel>
+                    <div>
+                        {this.renderTab(true, false)}
+                    </div>
+                </TabPanel>
+                <TabPanel>
+                    <div>
+                        {this.renderTab(true, true)}
+                    </div>
+                </TabPanel>
+            </Tabs>
+        )
+        
+    }
 }
 
-function getParentStyle(page) {
+function getParentStyle(page, showImg) {
+    let imgUrl = ""
+    if (showImg) {
+        imgUrl = `data:image/jpeg;base64, ${page.image}`
+    }
     return  {
-        display: 'absolute',
         width: `${page.width}px`,
         height: `${page.height}px`,
-        overflow: 'scroll'
+        overflow: 'scroll',
+        backgroundImage: `url("${imgUrl}")`
     }
 }
 
@@ -66,7 +110,7 @@ function getLineStyle(chosen, line) {
         lineHeight: `${line.height}px`,
         position: 'absolute',
         left: `${line.left}px`,
-        top: `${line.top}px`,
+        top: `${line.top + TAB_OFFSET}px`,
         border: "thin solid #000000",
         textAlign: "center",
         cursor: "pointer",
