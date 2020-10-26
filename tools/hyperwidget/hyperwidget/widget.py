@@ -18,5 +18,4 @@ class OCRVisualizer(widgets.DOMWidget):
     ).tag(sync=True)
 
     page = Dict().tag(sync=True)
-    lines = List().tag(sync=True)
-    line_idxs = List([0]).tag(sync=True)
+    line_idxs = List([]).tag(sync=True)

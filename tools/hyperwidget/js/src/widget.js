@@ -1,7 +1,7 @@
 import { DOMWidgetView, DOMWidgetModel } from '@jupyter-widgets/base'
 import _ from 'lodash';
 
-import OCRViz from './components/OCRViz';
+import OCRVisualizer from './components/OCRVisualizer';
 
 export class OCRVisualizerModel extends DOMWidgetModel {
     defaults () {
@@ -13,8 +13,7 @@ export class OCRVisualizerModel extends DOMWidgetModel {
             _view_module : 'hyperwidget',
             _model_module_version : '0.1.0',
             _view_module_version : '0.1.0'
-        }
-    
+        }    
     }
 }
 
@@ -24,8 +23,8 @@ export class OCRVisualizerView extends DOMWidgetView {
     render() {
         ReactDOM.render(
             React.createElement(
-                OCRViz, { model: this.model }),
+                OCRVisualizer, { model: this.model }),
             this.el,
-        );
+        )
     }
 }
