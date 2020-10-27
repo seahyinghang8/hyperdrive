@@ -3,6 +3,7 @@ import _ from 'lodash';
 
 import OCRVisualizer from './components/OCRVisualizer';
 
+
 export class OCRVisualizerModel extends DOMWidgetModel {
     defaults () {
         return {

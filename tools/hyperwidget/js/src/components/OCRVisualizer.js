@@ -97,7 +97,7 @@ class OCRVisualizer extends React.Component {
 function getParentStyle(page, showImg) {
     let imgUrl = ""
     if (showImg) {
-        imgUrl = `data:image/jpeg;base64, ${page.image}`
+        imgUrl = `data:image/jpeg;base64, ${page.b64_image}`
     }
     return  {
         width: `${page.width}px`,

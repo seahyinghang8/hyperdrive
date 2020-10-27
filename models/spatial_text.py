@@ -1,9 +1,12 @@
-from typing import List, Tuple, Optional
+from typing import List, Tuple, Optional, Dict, Any
 
 try:
     from PIL import Image
 except ImportError:
     import Image
+
+import base64
+from io import BytesIO
 
 
 # Definition of a Spatial Text class
@@ -223,6 +226,17 @@ class Block(SpatialText):
         return self._lines
 
 
+# Helper function to convert image to b64 encoding
+def convert_to_b64_image(image: Image) -> str:
+    in_mem_file = BytesIO()
+    image.save(in_mem_file, format="PNG")
+    in_mem_file.seek(0)
+    img_bytes = in_mem_file.read()
+    base64_encoded_result_bytes = base64.b64encode(img_bytes)
+    base64_encoded_result_str = base64_encoded_result_bytes.decode('ascii')
+    return base64_encoded_result_str
+
+
 # Definition of a Page class
 class Page(SpatialText):
     def __init__(self, lines: List[Line], image: Image):
@@ -270,6 +284,23 @@ class Page(SpatialText):
 
     def __len__(self) -> int:
         return len(self._lines)
+
+    def as_dict(self) -> dict:
+        page_dict: Dict[str, Any] = {}
+        page_dict['width'] = self.width
+        page_dict['height'] = self.height
+        page_dict['b64_image'] = convert_to_b64_image(self.image)
+        page_dict['lines'] = [
+            {
+                'height': line.height,
+                'width': line.width,
+                'left': line.left,
+                'top': line.top,
+                'text': str(line)
+            }
+            for line in self.lines
+        ]
+        return page_dict
 
     @property
     def lines(self) -> List[Line]:
