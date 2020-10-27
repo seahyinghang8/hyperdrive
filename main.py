@@ -50,7 +50,7 @@ if __name__ == "__main__":
         },
     ]
 
-    num_docs = 4
+    num_docs = 9
     extracted_fields = [
         extract_fields(dl.get_document(i), field_queries)
         for i in range(num_docs)
