@@ -1,9 +1,8 @@
 import ipywidgets as widgets
 from traitlets import Dict, List, Instance, Unicode, Integer
 
-# See js/lib/example.js for the frontend counterpart to this file.
 
-
+# Frontend counterpart in js/src/widget.js
 @widgets.register
 class OCRVisualizer(widgets.DOMWidget):
     _model_name = Unicode('OCRVisualizerModel').tag(sync=True)
