@@ -1,3 +1,70 @@
 .ocr-tab {
     overflow: scroll;
 }
+
+.tab {
+    align-items: center;
+    border-bottom: .05rem solid #cbd0d9;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-align: center;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+    list-style: none;
+    margin: .2rem 0 .15rem 0;
+}
+
+.tab .tab-item {
+    margin-top: 0;
+}
+
+.tab .tab-item a {
+    border-bottom: .1rem solid transparent;
+    color: inherit;
+    display: block;
+    margin: 0 .4rem 0 0;
+    padding: .4rem .2rem .3rem .2rem;
+    text-decoration: none;
+}
+
+.tab .tab-item a:focus,
+.tab .tab-item a:hover {
+    color: #5e81f4;
+}
+
+.tab .tab-item.active a,
+.tab .tab-item a.active {
+    border-bottom-color: #5e81f4;
+    color: #5e81f4;
+}
+
+.tab .tab-item.tab-action {
+    -ms-flex: 1 0 auto;
+    flex: 1 0 auto;
+    text-align: right;
+}
+
+.tab .tab-item .btn-clear {
+    margin-top: -.2rem;
+}
+
+.tab.tab-block .tab-item {
+    -ms-flex: 1 0 0;
+    flex: 1 0 0;
+    text-align: center;
+}
+
+.tab.tab-block .tab-item a {
+    margin: 0;
+}
+
+.tab.tab-block .tab-item .badge[data-badge]::after {
+    position: absolute;
+    right: .1rem;
+    top: .1rem;
+    transform: translate(0, 0);
+}
+
+.tab:not(.tab-block) .badge {
+    padding-right: 0;
+}

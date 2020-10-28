@@ -1,8 +1,6 @@
 import React from 'react'
-import { Tab, Tabs, TabList, TabPanel } from 'react-tabs'
 import SpatialTextLayout from './SpatialTextLayout'
 
-import 'react-tabs/style/react-tabs.css'
 import './OCRVisualizer.css'
 
 const PAGE_KEY = 'page'
@@ -13,9 +11,22 @@ class OCRVisualizer extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            LINE_IDX_KEY: this.props.model.get(LINE_IDX_KEY)
+            LINE_IDX_KEY: this.props.model.get(LINE_IDX_KEY),
+            activeTab: 0,
+            scale: 1
         }
     }
+
+    componentDidMount() {
+        // ugly hack
+        const page = this.props.model.get(PAGE_KEY)
+        setTimeout(
+            () => {
+                this.setState({
+                    scale: (this.container.offsetWidth - 30) / Number(page.width)
+                })
+            }, 10)
+}           
 
     lineClickHandler(evt) {
         var selectedLineIdxs = this.state.LINE_IDX_KEY
@@ -44,34 +55,35 @@ class OCRVisualizer extends React.Component {
             showLines={showLines}
             hideText={hideText}
             selectedLineIdxs={selectedLineIdxs}
+            scale={this.state.scale}
         />)
     }
 
-    render () {
-        return (
-            <Tabs>
-                <TabList>
-                    <Tab>OCR</Tab>
-                    <Tab>Image</Tab>
-                    <Tab>OCR + Image</Tab>
-                </TabList>
+    render() {
+        const tabTitle = ["OCR", "Image", "OCR + Image"]
+        const tabDiv = [
+            this.renderTab(false, true),
+            this.renderTab(true, false),
+            this.renderTab(true, true, true)
+        ]
 
-                <TabPanel>
-                    <div>
-                        {this.renderTab(false, true)}
-                    </div>
-                </TabPanel>
-                <TabPanel>
-                    <div>
-                        {this.renderTab(true, false)}
-                    </div>
-                </TabPanel>
-                <TabPanel>
-                    <div>
-                        {this.renderTab(true, true, true)}
-                    </div>
-                </TabPanel>
-            </Tabs>
+        return (
+            <div ref={el => (this.container = el)}>
+                <ul class="tab">
+                    { tabTitle.map((title, idx) => (
+                        <li class={`tab-item ${idx === this.state.activeTab ? 'active' : ''}`}
+                            key={title + idx}>
+                            <a href="#" onClick={() => {
+                                this.setState({activeTab: idx})
+                            }}>{title}</a>
+                        </li>
+                    ))}
+                </ul>
+                {
+                    this.state.scale > 0. &&
+                    tabDiv[this.state.activeTab]
+                }
+            </div>
         )
     }
 }
