@@ -47,7 +47,7 @@ class SpatialText:
     @property
     def center_left(self) -> int:
         return int(self.left + self.width / 2)
-    
+
     @property
     def center_top(self) -> int:
         return int(self.top + self.height / 2)
@@ -253,8 +253,8 @@ class Page(SpatialText):
         # ensure that all the spatial metadata are initialized
         self._left = min([ln.left for ln in self._lines])
         self._top = min([ln.top for ln in self._lines])
-        self._width = max([ln.right - self.left for ln in self._lines])
-        self._height = max([ln.bottom - self.top for ln in self._lines])
+        self._width = self.image.width
+        self._height = self.image.height
 
     def _compute_page_metadata(self) -> None:
         self._left_pos: List[Tuple[int, int]]

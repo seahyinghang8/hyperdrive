@@ -1,3 +1,70 @@
+.hyper-tooltip::after {
+    background: rgba(48, 55, 66, .95);
+    border-radius: .2rem;
+    bottom: 100%;
+    color: #fff;
+    content: attr(data-hyper-tooltip);
+    display: block;
+    font-size: .7rem;
+    left: 50%;
+    max-width: 320px;
+    opacity: 0;
+    overflow: hidden;
+    padding: .2rem .4rem;
+    pointer-events: none;
+    position: absolute;
+    text-overflow: ellipsis;
+    transform: translate(-50%, .4rem);
+    transition: opacity .2s, transform .2s;
+    white-space: pre;
+    z-index: 300;
+}
+
+.hyper-tooltip:focus::after,
+.hyper-tooltip:hover::after {
+    opacity: 1;
+    transform: translate(-50%, -.2rem);
+}
+
+.hyper-tooltip[disabled],
+.hyper-tooltip.disabled {
+    pointer-events: auto;
+}
+
+.hyper-tooltip.hyper-tooltip-right::after {
+    bottom: 50%;
+    left: 100%;
+    transform: translate(-.2rem, 50%);
+}
+
+.hyper-tooltip.hyper-tooltip-right:focus::after,
+.hyper-tooltip.hyper-tooltip-right:hover::after {
+    transform: translate(.2rem, 50%);
+}
+
+.hyper-tooltip.hyper-tooltip-bottom::after {
+    bottom: auto;
+    top: 100%;
+    transform: translate(-50%, -.4rem);
+}
+
+.hyper-tooltip.hyper-tooltip-bottom:focus::after,
+.hyper-tooltip.hyper-tooltip-bottom:hover::after {
+    transform: translate(-50%, .2rem);
+}
+
+.hyper-tooltip.hyper-tooltip-left::after {
+    bottom: 50%;
+    left: auto;
+    right: 100%;
+    transform: translate(.4rem, 50%);
+}
+
+.hyper-tooltip.hyper-tooltip-left:focus::after,
+.hyper-tooltip.hyper-tooltip-left:hover::after {
+    transform: translate(-.2rem, 50%);
+}
+
 .ocr-line {
     position: absolute;
     border: 1px solid #000000;
@@ -7,4 +74,11 @@
 
 .ocr-line.ocr-line-selected {
     background-color: rgba(0, 255, 113, 0.4);
+}
+
+.spatial-layout-container {
+    position: relative;
+    margin-left: 15px;
+    margin-right: 15px;
+    background-size: cover;
 }

@@ -1,60 +1,63 @@
-import React from 'react'
-import ReactTooltip from 'react-tooltip'
+import React, {useEffect} from 'react'
 
 import './SpatialTextLayout.css'
 
+const FONT_SIZE_TO_PIXEL_WIDTH = 0.62
 const FONT_SIZE_SCALE = 0.9
-const TAB_OFFSET = 44
-
 
 function SpatialTextLayout(props) {
-    ReactTooltip.rebuild();
     const selectedLineIdxs = props.selectedLineIdxs
     return (
-        <div style={getParentStyle(props.page, props.showImg)}>
+        <div className='spatial-layout-container' style={getParentStyle(props.page, props.showImg, props.scale)}>
             {
-                props.showLines && props.page.lines.map((line, index) => {
+                props.showLines && props.page.lines.map((line, idx) => {
                     return (
-                        <div onClick={props.lineOnClick}
-                            key={index}
-                            line-index={index}
-                            data-tip={line.text}
-                            data-for='preview'
-                            className={`ocr-line ${selectedLineIdxs.includes(index) && 'ocr-line-selected'}`}
-                            style={getLineStyle(line)}>
+                        <div 
+                            onClick={props.lineOnClick}
+                            key={idx}
+                            line-index={idx}
+                            data-hyper-tooltip={line.text}
+                            className={`hyper-tooltip ocr-line ${selectedLineIdxs.includes(idx) ? 'ocr-line-selected' : ''}`}
+                            style={getLineStyle(line, props.scale)}
+                        >
                             {!props.hideText && line.text}
                         </div>
                     )
                 })
             }
-            <ReactTooltip id='preview'/>
         </div>
     )
 }
 
 
-function getParentStyle(page, showImg) {
+function getParentStyle(page, showImg, scale) {
     let imgUrl = ""
     if (showImg) {
         imgUrl = `data:image/jpeg;base64, ${page.b64_image}`
     }
     return  {
-        width: `${page.width}px`,
-        height: `${page.height}px`,
-        backgroundImage: `url("${imgUrl}")`
+        width: `${page.width * scale}px`,
+        height: `${page.height * scale}px`,
+        backgroundImage: `url("${imgUrl}")`,
     }
 }
 
 
-function getLineStyle(line) {
-    let font_size = Math.min(line.height, line.width / line.text.length) * FONT_SIZE_SCALE
+function getLineStyle(line, scale) {
+    const font_height = line.height * FONT_SIZE_SCALE * scale
+    const font_width = line.width * scale / line.text.length / FONT_SIZE_TO_PIXEL_WIDTH
+    let font_size = Math.min(
+        font_height,
+        font_width
+    )
+
     return {
-        width: `${line.width}px`,
-        height: `${line.height}px`,
-        lineHeight: `${line.height}px`,
-        left: `${line.left}px`,
-        top: `${line.top + TAB_OFFSET}px`,
-        fontSize: font_size,
+        width: `${line.width * scale}px`,
+        height: `${line.height * scale}px`,
+        lineHeight: `${line.height * scale}px`,
+        left: `${line.left * scale}px`,
+        top: `${line.top * scale}px`,
+        fontSize: font_size
     }
 }
 

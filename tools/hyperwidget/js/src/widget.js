@@ -1,7 +1,9 @@
 import { DOMWidgetView, DOMWidgetModel } from '@jupyter-widgets/base'
 import _ from 'lodash';
 
-import OCRVisualizer from './components/OCRVisualizer';
+import OCRVisualizer from './components/OCRVisualizer'
+
+import './widget.css'
 
 
 export class OCRVisualizerModel extends DOMWidgetModel {
@@ -20,7 +22,6 @@ export class OCRVisualizerModel extends DOMWidgetModel {
 
 
 export class OCRVisualizerView extends DOMWidgetView {
-    // Render the view.
     render() {
         ReactDOM.render(
             React.createElement(
