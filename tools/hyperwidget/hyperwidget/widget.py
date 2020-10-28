@@ -36,15 +36,20 @@ class ErrorTable(widgets.DOMWidget):
     errors = Dict().tag(sync=True)
 
 
-# @widgets.register
-# class ErrorTable(widgets.DOMWidget):
-#     _model_name = Unicode('ErrorTableModel').tag(sync=True)
-#     _view_name = Unicode('ErrorTableView').tag(sync=True)
-#     _view_module = Unicode('hyperwidget').tag(sync=True)
-#     _view_module_version = Unicode('^0.1.0').tag(sync=True)
-#     _model_module = Unicode('hyperwidget').tag(sync=True)
-#     _model_module_version = Unicode('^0.1.0').tag(sync=True)
-#     # Version of the front-end module containing widget model
-#     _model_module_version = Unicode(
-#         '^{{ cookiecutter.npm_package_version }}'
-#     ).tag(sync=True)
+@widgets.register
+class ExtractionHeatmap(widgets.DOMWidget):
+    _model_name = Unicode('ExtractionHeatmapModel').tag(sync=True)
+    _view_name = Unicode('ExtractionHeatmapView').tag(sync=True)
+    _view_module = Unicode('hyperwidget').tag(sync=True)
+    _view_module_version = Unicode('^0.1.0').tag(sync=True)
+    _model_module = Unicode('hyperwidget').tag(sync=True)
+    _model_module_version = Unicode('^0.1.0').tag(sync=True)
+    # Version of the front-end module containing widget model
+    _model_module_version = Unicode(
+        '^{{ cookiecutter.npm_package_version }}'
+    ).tag(sync=True)
+
+    page = Dict().tag(sync=True)
+    field_name = Unicode('').tag(sync=True)
+    expected = Unicode('').tag(sync=True)
+    extracted_fields = List().tag(sync=True)
