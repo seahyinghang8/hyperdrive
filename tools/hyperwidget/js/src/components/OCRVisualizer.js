@@ -5,16 +5,6 @@ import './OCRVisualizer.css'
 
 const PAGE_KEY = 'page'
 const LINE_IDX_KEY = 'line_idxs'
-const LINE_STATES = {
-    0: {
-        'backgroundColor': 'rgba(0, 0, 0, 0.1)',
-
-    },
-    1: {
-        'backgroundColor': 'rgba(0, 255, 113, 0.5)'
-    },
-}
-
 
 
 class OCRVisualizer extends React.Component {
@@ -24,6 +14,19 @@ class OCRVisualizer extends React.Component {
         const lineStateArr = this.props.model.get(PAGE_KEY).lines.map((l, idx) => (
             selectedLineIdxs.includes(idx) ? 1 : 0
         ))
+
+        this.lineStates = {
+            0: {
+                'backgroundColor': 'rgba(0, 0, 0, 0.1)',
+                'showTooltip': true,
+                'showText': true
+            },
+            1: {
+                'backgroundColor': 'rgba(0, 255, 113, 0.5)',
+                'showTooltip': true,
+                'showText': true
+            },
+        }
         
         this.state = {
             lineStateArr: lineStateArr,
@@ -41,7 +44,7 @@ class OCRVisualizer extends React.Component {
                     scale: (this.container.offsetWidth - 30) / Number(page.width)
                 })
             }, 10)
-}           
+    }           
 
     lineClickHandler(evt) {
         // if line state between 0 and 1
@@ -62,28 +65,34 @@ class OCRVisualizer extends React.Component {
         })
     }
 
-    renderTab(showImg, showLines, hideText = false) {
+    renderTab(showImg, showLines, showText) {
         const page = this.props.model.get(PAGE_KEY)
+        if (showText) {
+            this.lineStates[0]['showText'] = true
+            this.lineStates[1]['showText'] = true
+        } else {
+            this.lineStates[0]['showText'] = false
+            this.lineStates[1]['showText'] = false
+        }
 
+        console.log(this.lineStates)
         return (<SpatialTextLayout
             page={page}
             lineStateArr={this.state.lineStateArr}
-            lineStates={LINE_STATES}
+            lineStates={this.lineStates}
             lineOnClick={evt => {this.lineClickHandler(evt)}}
             showImg={showImg}
             showLines={showLines}
-            showTooltip={true}
-            hideText={hideText}
             scale={this.state.scale}
         />)
     }
 
     render() {
         const tabTitle = ["OCR", "Image", "OCR + Image"]
-        const tabDiv = [
-            this.renderTab(false, true),
-            this.renderTab(true, false),
-            this.renderTab(true, true, true)
+        const tabDivArgs = [
+            [false, true, true],
+            [true, false, false],
+            [true, true, false]
         ]
 
         return (
@@ -100,7 +109,7 @@ class OCRVisualizer extends React.Component {
                 </ul>
                 {
                     this.state.scale > 0. &&
-                    tabDiv[this.state.activeTab]
+                    this.renderTab(...tabDivArgs[this.state.activeTab])
                 }
             </div>
         )
