@@ -10,8 +10,11 @@ function SpatialTextLayout(props) {
         <div className='spatial-layout-container' style={getParentStyle(props.page, props.showImg, props.scale)}>
             {
                 props.showLines && props.page.lines.map((line, idx) => {
-                    const bgColor = props.lineStates[props.lineStateArr[idx]]['backgroundColor']
-                    const className = `${props.showTooltip ? 'hyper-tooltip' : ''} ocr-line`
+                    const lineState = props.lineStates[props.lineStateArr[idx]]
+                    const bgColor = lineState['backgroundColor']
+                    const showTooltip = lineState['showTooltip']
+                    const showText = lineState['showText']
+                    const className = `${showTooltip ? 'hyper-tooltip' : ''} ocr-line`
                     return (
                         <div 
                             onClick={props.lineOnClick}
@@ -21,7 +24,7 @@ function SpatialTextLayout(props) {
                             className={className}
                             style={getLineStyle(line, props.scale, bgColor)}
                         >
-                            {!props.hideText && line.text}
+                            {showText && line.text}
                         </div>
                     )
                 })
