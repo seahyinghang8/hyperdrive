@@ -49,7 +49,6 @@ class ExtractionHeatmap(widgets.DOMWidget):
         '^{{ cookiecutter.npm_package_version }}'
     ).tag(sync=True)
 
-    page = Dict().tag(sync=True)
-    field_name = Unicode('').tag(sync=True)
-    expected = Unicode('').tag(sync=True)
+    pages = List().tag(sync=True)
+    labels = List().tag(sync=True)
     extracted_fields = List().tag(sync=True)

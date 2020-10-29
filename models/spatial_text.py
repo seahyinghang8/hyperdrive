@@ -117,6 +117,15 @@ class Line(SpatialText):
         self._words.append(new_word)
         self._compute_spatial_metadata(new_word)
 
+    def as_dict(self) -> dict:
+        return {
+            'height': self.height,
+            'width': self.width,
+            'left': self.left,
+            'top': self.top,
+            'text': str(self)
+        }
+
     def __str__(self) -> str:
         return ' '.join(self._word_to_str_list())
 
@@ -286,21 +295,15 @@ class Page(SpatialText):
         return len(self._lines)
 
     def as_dict(self) -> dict:
-        page_dict: Dict[str, Any] = {}
-        page_dict['width'] = self.width
-        page_dict['height'] = self.height
-        page_dict['b64_image'] = convert_to_b64_image(self.image)
-        page_dict['lines'] = [
-            {
-                'height': line.height,
-                'width': line.width,
-                'left': line.left,
-                'top': line.top,
-                'text': str(line)
-            }
-            for line in self.lines
-        ]
-        return page_dict
+        return {
+            'width': self.width,
+            'height': self.height,
+            'b64_image': convert_to_b64_image(self.image),
+            'lines': [
+                line.as_dict()
+                for line in self.lines
+            ]
+        }
 
     @property
     def lines(self) -> List[Line]:
