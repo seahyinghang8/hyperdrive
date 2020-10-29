@@ -10,13 +10,17 @@ from models.document import Document
 from utils.nlu import get_entity_scores
 from utils.extract import get_nearby_words
 
+
 def generate_query(
-    line: Line, page: Page, nlp: English = None
+    name: str,
+    line: Line,
+    page: Page,
+    nlp: English = None
 ) -> Dict:
     if not nlp:
         nlp = spacy.load("en_core_web_sm")
     query = {
-        "name": "Extracted Field",
+        "name": name,
         "arguments": {
             "x-position": 0.0,
             "y-position": 0.0,
@@ -26,10 +30,10 @@ def generate_query(
             "word-neighbor-left-thres": 0.1,
         },
         "weights": {
-            "x-position": 0.5,
-            "y-position": 0.2,
-            "entity": 0.5,
-            "word-neighbors": 0.2,
+            "x-position": 0.25,
+            "y-position": 0.25,
+            "entity": 0.25,
+            "word-neighbors": 0.25,
         }
     }
     query["arguments"]["entity"] = _gen_entity(line, nlp)
@@ -39,6 +43,7 @@ def generate_query(
     query["arguments"]['word-neighbors'] = _gen_word_neighbors(
         line, page)
     return query
+
 
 def _gen_entity(
     line: Line,
@@ -56,6 +61,7 @@ def _gen_entity(
             best_label = cur_label
     return best_label
 
+
 def _gen_position(
     line: Line,
     page: Page
@@ -64,6 +70,7 @@ def _gen_position(
         line.center_left / page.width,
         line.center_top / page.height
     )
+
 
 def _gen_word_neighbors(
     line: Line,

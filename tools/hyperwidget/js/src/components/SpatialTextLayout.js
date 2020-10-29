@@ -14,17 +14,41 @@ function SpatialTextLayout(props) {
                     const bgColor = lineState['backgroundColor']
                     const showTooltip = lineState['showTooltip']
                     const showText = lineState['showText']
-                    const className = `${showTooltip ? 'hyper-tooltip' : ''} ocr-line`
+                    const popover = lineState['popover']
+                    const showPopover = popover !== undefined
+                    let className = 'ocr-line'
+                    if (showTooltip) className += ' hyper-tooltip'
+                    if (showPopover) {
+                        className += ' hyper-popover'
+                        const xNorm = (line.left + line.width / 2) / props.page.width
+                        if (xNorm < 0.2) {
+                            className += ' hyper-popover-right'
+                        } else if (xNorm > 0.8) {
+                            className += ' hyper-popover-left'
+                        } else {
+                            className += ' hyper-popover-top'
+                        }
+                    }
                     return (
                         <div 
+                            style={getLinePosStyle(line, props.scale)}
                             onClick={props.lineOnClick}
+                            className={className}
                             key={idx}
                             line-index={idx}
                             data-hyper-tooltip={line.text}
-                            className={className}
-                            style={getLineStyle(line, props.scale, bgColor)}
                         >
-                            {showText && line.text}
+                            <div
+                                style={getLineTextStyle(line, props.scale, bgColor)}
+                                line-index={idx}
+                            >
+                                { showText && line.text }
+                            </div>
+                            { showPopover && (
+                                <div className='hyper-popover-container'>
+                                    {popover}
+                                </div>
+                            )}
                         </div>
                     )
                 })
@@ -37,28 +61,28 @@ function SpatialTextLayout(props) {
 function getParentStyle(page, showImg, scale) {
     const imgUrl = showImg ? `data:image/jpeg;base64, ${page.b64_image}` : ''
     return  {
-        width: `${page.width * scale}px`,
-        height: `${page.height * scale}px`,
+        width: page.width * scale,
+        height: page.height * scale,
         backgroundImage: `url("${imgUrl}")`,
     }
 }
 
-
-function getLineStyle(line, scale, color) {
-    const font_height = line.height * FONT_SIZE_SCALE * scale
-    const font_width = line.width * scale / line.text.length / FONT_SIZE_TO_PIXEL_WIDTH
-    let font_size = Math.min(
-        font_height,
-        font_width
-    )
-
+function getLinePosStyle(line, scale) {
     return {
-        width: `${line.width * scale}px`,
-        height: `${line.height * scale}px`,
+        left: line.left * scale,
+        top: line.top * scale,
+    }
+}
+
+function getLineTextStyle(line, scale, color) {
+    const fontHeight = line.height * FONT_SIZE_SCALE * scale
+    const fontWidth = line.width * scale / line.text.length / FONT_SIZE_TO_PIXEL_WIDTH
+    const fontSize = Math.min(fontHeight, fontWidth)
+    return {
+        width: line.width * scale,
+        height: line.height * scale,
         lineHeight: `${line.height * scale}px`,
-        left: `${line.left * scale}px`,
-        top: `${line.top * scale}px`,
-        fontSize: font_size,
+        fontSize: fontSize,
         backgroundColor: color,
     }
 }

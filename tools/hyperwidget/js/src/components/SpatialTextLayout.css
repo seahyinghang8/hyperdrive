@@ -65,6 +65,65 @@
     transform: translate(-.2rem, 50%);
 }
 
+.hyper-popover {
+    display: inline-block;
+    position: relative;
+}
+
+.hyper-popover .hyper-popover-container {
+    left: 50%;
+    opacity: 0;
+    padding: .4rem;
+    position: absolute;
+    top: 0;
+    transform: translate(-50%, -50%) scale(0);
+    transition: transform .2s;
+    width: 320px;
+    z-index: 300;
+}
+
+.hyper-popover *:focus + .hyper-popover-container,
+.hyper-popover:hover .hyper-popover-container {
+    display: block;
+    opacity: 1;
+    transform: translate(-50%, -100%) scale(1);
+}
+
+.hyper-popover.hyper-popover-right .hyper-popover-container {
+    left: 100%;
+    top: 50%;
+}
+
+.hyper-popover.hyper-popover-right *:focus + .hyper-popover-container,
+.hyper-popover.hyper-popover-right:hover .hyper-popover-container {
+    transform: translate(0, -50%) scale(1);
+}
+
+.hyper-popover.hyper-popover-bottom .hyper-popover-container {
+    left: 50%;
+    top: 100%;
+}
+
+.hyper-popover.hyper-popover-bottom *:focus + .hyper-popover-container,
+.hyper-popover.hyper-popover-bottom:hover .hyper-popover-container {
+    transform: translate(-50%, 0) scale(1);
+}
+
+.hyper-popover.hyper-popover-left .hyper-popover-container {
+    left: 0;
+    top: 50%;
+}
+
+.hyper-popover.hyper-popover-left *:focus + .hyper-popover-container,
+.hyper-popover.hyper-popover-left:hover .hyper-popover-container {
+    transform: translate(-100%, -50%) scale(1);
+}
+
+.hyper-popover .card {
+    border: 0; 
+    box-shadow: 0 .2rem .5rem rgba(48, 55, 66, .15);
+}
+
 .ocr-line {
     position: absolute;
     text-align: center;

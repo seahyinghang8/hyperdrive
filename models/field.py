@@ -36,3 +36,11 @@ class ExtractedField:
             f"score={self.score.total_score:.2f})"
         )
         return out_str
+
+    def as_dict(self) -> dict:
+        return {
+            'line': self.line.as_dict(),
+            'index': self.index,
+            'scores': self.score._scores,
+            'weights': self.score._weights
+        }
