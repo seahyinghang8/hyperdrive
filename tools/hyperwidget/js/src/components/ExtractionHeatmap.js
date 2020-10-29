@@ -2,7 +2,6 @@ import React from 'react'
 import SpatialTextLayout from './SpatialTextLayout'
 
 import './ExtractionHeatmap.css'
-import { update } from 'lodash'
 
 const COLOR_LIST = [
     '#093145',
