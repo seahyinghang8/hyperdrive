@@ -52,8 +52,11 @@ class ExtractionHeatmap extends React.Component {
             <div class="hyper-input-group">
                 <span class="hyper-input-group-addon">Doc Index</span>
                 <select class="form-select" onChange={evt => {
+                    const weights = deepcopy(this.extractedFields[evt.target.value][this.state.fieldName][0]['weights'])
                     this.setState({
-                        docIndex: evt.target.value
+                        docIndex: evt.target.value,
+                        weights: weights,
+                        inputError: false
                     })
                 }}>
                     { [...Array(numDocs).keys()].map(idx => (
@@ -156,7 +159,8 @@ class ExtractionHeatmap extends React.Component {
 
     renderHeatmap() {
         const page = this.pages[this.state.docIndex]
-        const scale = (this.state.windowWidth - 30) / Number(page.width)
+        let scale = (this.state.windowWidth - 30) / Number(page.width)
+        if (scale > 1) scale = 1
 
         const extractedDict = this.extractedFields[this.state.docIndex]
         const extractedArr = extractedDict[this.state.fieldName]
