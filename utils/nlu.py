@@ -1,9 +1,12 @@
+import re
 from collections import defaultdict
 from typing import DefaultDict, Tuple
 
 import spacy
 from spacy.lang.en import English
 from rapidfuzz import fuzz
+
+from utils.regex_entities import REGEX_ENTITIES
 
 
 def get_entity_scores(
@@ -21,6 +24,12 @@ def get_entity_scores(
     for score, ents in nlp.entity.moves.get_beam_parses(beams[0]):
         for start, end, label in ents:
             entity_scores[(start, end, label)] += score
+    for regex_label in REGEX_ENTITIES:
+        doc_text = doc.text
+        regex_res = re.search(
+            REGEX_ENTITIES[regex_label], doc_text)
+        if (regex_res):
+            entity_scores[(*regex_res.span(), regex_label)] += 1
     return entity_scores
 
 

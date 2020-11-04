@@ -19,16 +19,16 @@ if __name__ == "__main__":
             "arguments": {
                 "x-position": 0.1,
                 "y-position": 0.1,
-                "entity": "CARDINAL",
+                "entity": "EIN",
                 "word-neighbors": ["Employer", "Identification", "Number"],
-                "word-neighbor-top-thres": 50,
-                "word-neighbor-left-thres": 200,
+                "word-neighbor-top-thres": 0.05,
+                "word-neighbor-left-thres": 0.1,
             },
             "weights": {
-                "x-position": 0.5,
-                "y-position": 0.2,
-                "entity": 0.5,
-                "word-neighbors": 0.2,
+                "x-position": 0.25,
+                "y-position": 0.25,
+                "entity": 0.25,
+                "word-neighbors": 0.25,
             }
         },
         {   # Field 2
@@ -38,16 +38,16 @@ if __name__ == "__main__":
                 "y-position": 0.1,
                 "entity": "CARDINAL",
                 "word-neighbors": ["Medicare", "Tax", "Withheld"],
-                "word-neighbor-top-thres": 50,
-                "word-neighbor-left-thres": 200,
+                "word-neighbor-top-thres": 0.05,
+                "word-neighbor-left-thres": 0.1,
             },
             "weights": {
-                "x-position": 0.2,
-                "y-position": 0.4,
-                "entity": 0.5,
-                "word-neighbors": 0.2,
+                "x-position": 0.25,
+                "y-position": 0.25,
+                "entity": 0.25,
+                "word-neighbors": 0.25,
             }
-        },
+        }
     ]
 
     num_docs = 9

@@ -6,11 +6,13 @@ except ImportError:
     import Image
 
 from models.spatial_text import Line, Word
+from utils.img_preprocess import ocr_preprocess
 
 
 # Process image using Tesseract OCR to get a list of Lines
 def process_image(image: Image) -> List[Line]:
-    tesseract_out = pytesseract.image_to_data(image)
+    tesseract_out = pytesseract.image_to_data(
+        ocr_preprocess(image))
     return _parse_tesseract_data(tesseract_out)
 
 
