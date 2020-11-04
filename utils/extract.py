@@ -153,16 +153,29 @@ def _score_entity(
 
 
 def _get_word_scores(
+    line:  Line,
     line_idxs: Set[int],
     lines: List[Line],
-    word_neighbors: List[str]
+    word_neighbors: List[str],
+    page: Page
 ) -> float:
     word_scores = [0. for _ in range(len(word_neighbors))]
     for line_idx in line_idxs:
         for i, wn in enumerate(word_neighbors):
-            word_scores[i] = max(
-                word_scores[i], fuzzy_word_equal(wn, str(lines[line_idx])))
+            cur_score = (
+                fuzzy_word_equal(wn, str(lines[line_idx])) *
+                _dist_word_score(lines[line_idx], line, page)
+            )
+            word_scores[i] = max(word_scores[i], cur_score)
     return sum(word_scores) / len(word_scores)
+
+
+def _dist_word_score(
+    line_a: Line, line_b: Line, page: Page
+) -> float:
+    y_score = 1. - (line_a.center_top - line_b.center_left) / page.height
+    x_score = 1. - (line_a.center_left - line_b.center_left) / page.height
+    return (x_score + y_score) / 2.
 
 
 def _score_near_words(
@@ -175,7 +188,7 @@ def _score_near_words(
     valid_line_idxs = get_nearby_words(
         line, page, norm_top_thres, norm_left_thres)
     return _get_word_scores(
-        valid_line_idxs, page.lines, word_neighbors)
+        line, valid_line_idxs, page.lines, word_neighbors, page)
 
 def get_nearby_words(
     line: Line,
