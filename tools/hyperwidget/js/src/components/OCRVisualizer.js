@@ -3,16 +3,11 @@ import SpatialTextLayout from './SpatialTextLayout'
 
 import './OCRVisualizer.css'
 
-const PAGE_KEY = 'page'
-const LINE_IDX_KEY = 'line_idxs'
-
-
 class OCRVisualizer extends React.Component {
     constructor(props) {
         super(props)
-        const selectedLineIdxs = Array.from(this.props.model.get(LINE_IDX_KEY))
-        const lineStateArr = this.props.model.get(PAGE_KEY).lines.map((l, idx) => (
-            selectedLineIdxs.includes(idx) ? 1 : 0
+        const lineStateArr = this.props.page.lines.map((l, idx) => (
+            props.selectedLines.includes(idx) ? 1 : 0
         ))
 
         this.lineStates = {
@@ -37,11 +32,10 @@ class OCRVisualizer extends React.Component {
 
     componentDidMount() {
         // ugly hack
-        const page = this.props.model.get(PAGE_KEY)
         setTimeout(
             () => {
                 this.setState({
-                    scale: (this.container.offsetWidth - 30) / Number(page.width)
+                    scale: (this.container.offsetWidth - 30) / Number(this.props.page.width)
                 })
             }, 10)
     }           
@@ -49,15 +43,14 @@ class OCRVisualizer extends React.Component {
     lineClickHandler(evt) {
         // if line state between 0 and 1
         const lineIdx = Number(evt.target.getAttribute('line-index'))
-        let selectedLineIdxs = Array.from(this.props.model.get(LINE_IDX_KEY))
+        let selectedLines = this.props.selectedLines
         if (this.state.lineStateArr[lineIdx] == 1) {
-            const lineIdxIdx = selectedLineIdxs.indexOf(lineIdx)
-            selectedLineIdxs.splice(lineIdxIdx, 1)
+            const lineIdxIdx = selectedLines.indexOf(lineIdx)
+            selectedLines.splice(lineIdxIdx, 1)
         } else {
-            selectedLineIdxs.push(lineIdx)
+            selectedLines.push(lineIdx)
         }
-        this.props.model.set(LINE_IDX_KEY, selectedLineIdxs)
-        this.props.model.save_changes()
+        this.props.setSelectedLines(selectedLines)
         this.setState((state) => {
             let prevLineState = state.lineStateArr
             prevLineState[lineIdx] = prevLineState[lineIdx] == 1 ? 0 : 1
@@ -66,7 +59,6 @@ class OCRVisualizer extends React.Component {
     }
 
     renderTab(showImg, showLines, showText) {
-        const page = this.props.model.get(PAGE_KEY)
         if (showText) {
             this.lineStates[0]['showText'] = true
             this.lineStates[1]['showText'] = true
@@ -75,9 +67,8 @@ class OCRVisualizer extends React.Component {
             this.lineStates[1]['showText'] = false
         }
 
-        console.log(this.lineStates)
         return (<SpatialTextLayout
-            page={page}
+            page={this.props.page}
             lineStateArr={this.state.lineStateArr}
             lineStates={this.lineStates}
             lineOnClick={evt => {this.lineClickHandler(evt)}}

@@ -14,15 +14,12 @@ const COLOR_LIST = [
 class ExtractionHeatmap extends React.Component {
     constructor(props) {
         super(props)
-        this.pages = this.props.model.get('pages')
-        this.labels = this.props.model.get('labels')
-        this.extractedFields = this.props.model.get('extracted_fields')
 
         // Set starting state to the 0th index of all inputs
         const startIndex = 0
-        const startFieldNames = Object.keys(this.extractedFields[startIndex])
+        const startFieldNames = Object.keys(this.props.extractedFields[startIndex])
         const startField = startFieldNames[0]
-        const startWeights = deepcopy(this.extractedFields[startIndex][startField][0]['weights'])
+        const startWeights = deepcopy(this.props.extractedFields[startIndex][startField][0]['weights'])
 
         this.state = {
             docIndex: startIndex,
@@ -46,13 +43,13 @@ class ExtractionHeatmap extends React.Component {
     }           
 
     renderDocSelect() {
-        const numDocs = this.pages.length
+        const numDocs = this.props.pages.length
         
         return (
             <div class="hyper-input-group">
                 <span class="hyper-input-group-addon">Doc Index</span>
                 <select class="form-select" onChange={evt => {
-                    const weights = deepcopy(this.extractedFields[evt.target.value][this.state.fieldName][0]['weights'])
+                    const weights = deepcopy(this.props.extractedFields[evt.target.value][this.state.fieldName][0]['weights'])
                     this.setState({
                         docIndex: evt.target.value,
                         weights: weights,
@@ -68,7 +65,7 @@ class ExtractionHeatmap extends React.Component {
     } 
 
     renderFieldSelect() {
-        const fieldNames = Object.keys(this.extractedFields[this.state.docIndex])
+        const fieldNames = Object.keys(this.props.extractedFields[this.state.docIndex])
 
         return (
             <div class="hyper-input-group">
@@ -76,7 +73,7 @@ class ExtractionHeatmap extends React.Component {
                 <select class="form-select" 
                 value={this.state.fieldName}
                 onChange={(evt => {
-                    const weights = deepcopy(this.extractedFields[this.state.docIndex][evt.target.value][0]['weights'])
+                    const weights = deepcopy(this.props.extractedFields[this.state.docIndex][evt.target.value][0]['weights'])
                     this.setState({
                         fieldName: evt.target.value,
                         weights: weights,
@@ -92,7 +89,7 @@ class ExtractionHeatmap extends React.Component {
     }
 
     renderExpectedValue() {
-        const docLabels = this.labels[this.state.docIndex]
+        const docLabels = this.props.labels[this.state.docIndex]
         const expected = docLabels[this.state.fieldName]
 
         return (
@@ -158,11 +155,11 @@ class ExtractionHeatmap extends React.Component {
     }
 
     renderHeatmap() {
-        const page = this.pages[this.state.docIndex]
+        const page = this.props.pages[this.state.docIndex]
         let scale = (this.state.windowWidth - 30) / Number(page.width)
         if (scale > 1) scale = 1
 
-        const extractedDict = this.extractedFields[this.state.docIndex]
+        const extractedDict = this.props.extractedFields[this.state.docIndex]
         const extractedArr = extractedDict[this.state.fieldName]
         let extractedLinesScores = {}
         let minScore = 10

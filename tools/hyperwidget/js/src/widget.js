@@ -27,7 +27,14 @@ export class OCRVisualizerView extends DOMWidgetView {
     render() {
         ReactDOM.render(
             React.createElement(
-                OCRVisualizer, { model: this.model }),
+                OCRVisualizer, {
+                    page: this.model.get('page'),
+                    selectedLines: this.model.get('selected_lines'),
+                    setSelectedLines: selectedLines => {
+                        this.model.set('selected_lines', Array.from(selectedLines))
+                        this.model.save_changes()
+                    }
+                }),
             this.el,
         )
     }
@@ -53,7 +60,7 @@ export class ErrorTableView extends DOMWidgetView {
     render() {
         ReactDOM.render(
             React.createElement(
-                ErrorTable, { model: this.model }),
+                ErrorTable, { errors: this.model.get('errors') }),
             this.el,
         )
     }
@@ -79,7 +86,11 @@ export class ExtractionHeatmapView extends DOMWidgetView {
     render() {
         ReactDOM.render(
             React.createElement(
-                ExtractionHeatmap, { model: this.model }),
+                ExtractionHeatmap, {
+                    pages: this.props.model.get('pages'),
+                    labels: this.props.model.get('labels'),
+                    extractedFields: this.props.get('extracted_fields')
+                }),
             this.el,
         )
     }
