@@ -19,7 +19,7 @@ def cluster_text(lines: List[Line], image: Image) -> List[Line]:
 # Break up each line into multiple clustered lines
 def _cluster_words(lines: List[Line], image: Image) -> List[Line]:
     params = {
-        'threshold': 0.5,
+        'threshold': 0.65,
         'position_weight': 0.5,
         'font_size_weight': 0.5,
         'color_weight': 0.
