@@ -87,9 +87,9 @@ export class ExtractionHeatmapView extends DOMWidgetView {
         ReactDOM.render(
             React.createElement(
                 ExtractionHeatmap, {
-                    pages: this.props.model.get('pages'),
-                    labels: this.props.model.get('labels'),
-                    extractedFields: this.props.get('extracted_fields')
+                    pages: this.model.get('pages'),
+                    labels: this.model.get('labels'),
+                    extractedFields: this.model.get('extracted_fields')
                 }),
             this.el,
         )

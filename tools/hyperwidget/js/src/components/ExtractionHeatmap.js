@@ -17,9 +17,9 @@ class ExtractionHeatmap extends React.Component {
 
         // Set starting state to the 0th index of all inputs
         const startIndex = 0
-        const startFieldNames = Object.keys(this.props.extractedFields[startIndex])
+        const startFieldNames = Object.keys(props.extractedFields[startIndex])
         const startField = startFieldNames[0]
-        const startWeights = deepcopy(this.props.extractedFields[startIndex][startField][0]['weights'])
+        const startWeights = deepcopy(props.extractedFields[startIndex][startField][0]['weights'])
 
         this.state = {
             docIndex: startIndex,

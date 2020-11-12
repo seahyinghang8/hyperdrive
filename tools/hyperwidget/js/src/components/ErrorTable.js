@@ -15,8 +15,8 @@ function ErrorTable(props) {
                 </tr>
             </thead>
             <tbody>
-                { Object.keys(this.props.errors).map(error_key => (
-                    this.props.errors[error_key].map(row => (
+                { Object.keys(props.errors).map(error_key => (
+                    props.errors[error_key].map(row => (
                         <tr key={Array.from(row).join('')}>
                             <td key={error_key}>{error_key}</td>
                             { row.map(data => (
