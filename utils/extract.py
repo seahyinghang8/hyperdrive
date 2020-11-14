@@ -162,8 +162,14 @@ def _get_word_scores(
     word_scores = [0. for _ in range(len(word_neighbors))]
     for line_idx in line_idxs:
         for i, wn in enumerate(word_neighbors):
+            word_score = 0
+            neighboring_line_str = str(lines[line_idx])
+            if (wn.lower() in neighboring_line_str.lower()):
+                word_score = 1
+            else:
+                word_score = fuzzy_word_equal(wn, str(lines[line_idx]))
             cur_score = (
-                fuzzy_word_equal(wn, str(lines[line_idx])) *
+                word_score *
                 _dist_word_score(lines[line_idx], line, page)
             )
             word_scores[i] = max(word_scores[i], cur_score)
@@ -171,10 +177,12 @@ def _get_word_scores(
 
 
 def _dist_word_score(
-    line_a: Line, line_b: Line, page: Page
+    line_a: Line,
+    line_b: Line,
+    page: Page,
 ) -> float:
-    y_score = 1. - (line_a.center_top - line_b.center_left) / page.height
-    x_score = 1. - (line_a.center_left - line_b.center_left) / page.height
+    y_score = 1. - abs(line_a.center_top - line_b.center_top) / page.height
+    x_score = 1. - abs(line_a.center_left - line_b.center_left) / page.width
     return (x_score + y_score) / 2.
 
 
@@ -241,4 +249,6 @@ def get_nearby_words(
         if exceeded:
             break
         j += 1
-    return valid_left_lines & valid_top_lines
+    valid_lines = valid_left_lines & valid_top_lines
+    valid_lines = {vl for vl in valid_lines if str(page.lines[vl]) != str(line)}
+    return valid_lines
