@@ -2,12 +2,9 @@ import React from 'react'
 
 import './ErrorTable.css'
 
-const ERROR_KEY = 'errors'
-
 
 function ErrorTable(props) {
     const headers = ['Field', 'Doc Index', 'Actual Output', 'Expected']
-    const error_dict = props.model.get(ERROR_KEY)
     return (
         <table className='table table-striped table-hover'>
             <thead>
@@ -18,8 +15,8 @@ function ErrorTable(props) {
                 </tr>
             </thead>
             <tbody>
-                { Object.keys(error_dict).map(error_key => (
-                    error_dict[error_key].map(row => (
+                { Object.keys(props.errors).map(error_key => (
+                    props.errors[error_key].map(row => (
                         <tr key={Array.from(row).join('')}>
                             <td key={error_key}>{error_key}</td>
                             { row.map(data => (

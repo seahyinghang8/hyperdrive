@@ -1,3 +1,10 @@
+:root {
+  --color0: #093145;
+  --color1: #cf7a19;
+  --color2: #829356;
+  --color3: #901f10;
+}
+
 
 .cols,
 .columns {
@@ -857,4 +864,40 @@ input.disabled + .form-icon {
 
 .bar-slider .bar-slider-btn:active {
   box-shadow: 0 0 0 .1rem #5e81f4;
+}
+
+.form-switch input:checked + .form-icon.color-0 {
+  background: var(--color0);
+  border-color: var(--color0);
+}
+
+.form-switch input:checked + .form-icon.color-1 {
+  background: var(--color1);
+  border-color: var(--color1);
+}
+
+.form-switch input:checked + .form-icon.color-2 {
+  background: var(--color2);
+  border-color: var(--color2);
+}
+
+.form-switch input:checked + .form-icon.color-3 {
+  background: var(--color3);
+  border-color: var(--color3);
+}
+
+.bar-item.color-0 {
+  background: var(--color0);
+}
+
+.bar-item.color-1 {
+  background: var(--color1);
+}
+
+.bar-item.color-2 {
+  background: var(--color2);
+}
+
+.bar-item.color-3 {
+  background: var(--color3);
 }

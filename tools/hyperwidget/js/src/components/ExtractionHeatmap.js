@@ -3,33 +3,27 @@ import SpatialTextLayout from './SpatialTextLayout'
 
 import './ExtractionHeatmap.css'
 
-const COLOR_LIST = [
-    '#093145',
-    '#829356',
-    '#C2571A',
-    '#9A2617',
-]
-
 
 class ExtractionHeatmap extends React.Component {
     constructor(props) {
         super(props)
-        this.pages = this.props.model.get('pages')
-        this.labels = this.props.model.get('labels')
-        this.extractedFields = this.props.model.get('extracted_fields')
 
         // Set starting state to the 0th index of all inputs
-        const startIndex = 0
-        const startFieldNames = Object.keys(this.extractedFields[startIndex])
+        const startDocIndex = 0
+        const startFieldNames = Object.keys(props.extractedFields[startDocIndex])
         const startField = startFieldNames[0]
-        const startWeights = deepcopy(this.extractedFields[startIndex][startField][0]['weights'])
+        const startWeights = props.extractedFields[startDocIndex][startField][0]['weights']
+        let selectedWeights = {}
+        Object.keys(startWeights).map(keyname => {
+            selectedWeights[keyname] = true
+        })
 
         this.state = {
-            docIndex: startIndex,
+            docIndex: startDocIndex,
             fieldName: startField,
-            weights: startWeights,
-            inputError: false,
+            selectedWeights: selectedWeights,
             windowWidth: 0,
+            selectedLines: []
         }
     }
 
@@ -46,17 +40,20 @@ class ExtractionHeatmap extends React.Component {
     }           
 
     renderDocSelect() {
-        const numDocs = this.pages.length
+        const numDocs = this.props.pages.length
         
         return (
             <div class="hyper-input-group">
                 <span class="hyper-input-group-addon">Doc Index</span>
                 <select class="form-select" onChange={evt => {
-                    const weights = deepcopy(this.extractedFields[evt.target.value][this.state.fieldName][0]['weights'])
+                    const startWeights = this.props.extractedFields[evt.target.value][this.state.fieldName][0]['weights']
+                    let selectedWeights = {}
+                    Object.keys(startWeights).map(keyname => {
+                        selectedWeights[keyname] = true
+                    })
                     this.setState({
                         docIndex: evt.target.value,
-                        weights: weights,
-                        inputError: false
+                        selectedWeights: selectedWeights
                     })
                 }}>
                     { [...Array(numDocs).keys()].map(idx => (
@@ -68,7 +65,7 @@ class ExtractionHeatmap extends React.Component {
     } 
 
     renderFieldSelect() {
-        const fieldNames = Object.keys(this.extractedFields[this.state.docIndex])
+        const fieldNames = Object.keys(this.props.extractedFields[this.state.docIndex])
 
         return (
             <div class="hyper-input-group">
@@ -76,11 +73,14 @@ class ExtractionHeatmap extends React.Component {
                 <select class="form-select" 
                 value={this.state.fieldName}
                 onChange={(evt => {
-                    const weights = deepcopy(this.extractedFields[this.state.docIndex][evt.target.value][0]['weights'])
+                    const startWeights = this.props.extractedFields[this.state.docIndex][evt.target.value][0]['weights']
+                    let selectedWeights = {}
+                    Object.keys(startWeights).map(keyname => {
+                        selectedWeights[keyname] = true
+                    })
                     this.setState({
                         fieldName: evt.target.value,
-                        weights: weights,
-                        inputError: false,
+                        selectedWeights: selectedWeights
                     })
                 })}>
                     { fieldNames.map(name => (
@@ -92,7 +92,7 @@ class ExtractionHeatmap extends React.Component {
     }
 
     renderExpectedValue() {
-        const docLabels = this.labels[this.state.docIndex]
+        const docLabels = this.props.labels[this.state.docIndex]
         const expected = docLabels[this.state.fieldName]
 
         return (
@@ -103,110 +103,113 @@ class ExtractionHeatmap extends React.Component {
         )
     }
 
-    renderWeightAdjuster() {
-        const weightKeys = Object.keys(this.state.weights)
-        const hasError = this.state.weightsError
+    renderWeightSelect() {
+        const weightsName = Object.keys(this.state.selectedWeights)
 
         return (
             <div className='columns' style={{marginTop: 10}}>
-                { weightKeys.map((key) => {
-                    const weightPercent = (this.state.weights[key] * 100).toFixed(0)
-                    const onChangeWeight = (evt) => {
-                        let errorState = false
-                        let weight = Number(evt.target.value) / 100
-                        if (isNaN(weight)) {
-                            errorState = true
-                            weight = 0
-                        }
-                        // validate weight adds up to 1
-                        let weightSum = 0
-                        for (const k of weightKeys) {
-                            const currWeight = (k == key) ? weight : this.state.weights[k]
-                            weightSum += currWeight
-                            if (currWeight < 0) errorState = true
-                        }
-                        if (weightSum > 1) errorState = true
-                        // update weights and error state
-                        this.setState((prevState) => {
-                            let updatedWeights = prevState.weights
-                            updatedWeights[key] = weight
+                { weightsName.map((name, i) => {
+                    const checked = this.state.selectedWeights[name]
+                    const setChecked = () => {
+                        this.setState(oldState => {
+                            let newWeightsSelected = deepcopy(oldState.selectedWeights)
+                            newWeightsSelected[name] = !newWeightsSelected[name]
                             return {
-                                weights: updatedWeights,
-                                weightsError: errorState
+                                selectedWeights: newWeightsSelected
                             }
                         })
                     }
                     return (
-                        <div className='column col-3' key={key}>
-                            <div className={`hyper-input-group ${ hasError ? 'has-error' : ''}`}>
-                                <span class="hyper-input-group-addon">{key}</span>
-                                <input
-                                    class="form-input"
-                                    type="number"
-                                    value={weightPercent}
-                                    onChange={onChangeWeight}
-                                />
+                        <div className='column col-3' key={name} >
+                            <div class="form-group">
+                                <label class="form-switch">
+                                    <input type="checkbox" onChange={setChecked} checked={checked}/>
+                                    <i class={`form-icon color-${i % 4}`}></i>{name} weight
+                                </label>
                             </div>
                         </div>
-                    )
+                        )
                 })}
-                { hasError && (
-                    <div style={{color: 'red', marginLeft: 10}}>Sum of weights is greater than 100</div>
-                )}
             </div>
         )
     }
 
     renderHeatmap() {
-        const page = this.pages[this.state.docIndex]
+        const page = this.props.pages[this.state.docIndex]
         let scale = (this.state.windowWidth - 30) / Number(page.width)
         if (scale > 1) scale = 1
 
-        const extractedDict = this.extractedFields[this.state.docIndex]
+        const extractedDict = this.props.extractedFields[this.state.docIndex]
         const extractedArr = extractedDict[this.state.fieldName]
-        let extractedLinesScores = {}
-        let minScore = 10
-        let maxScore = 0
-        extractedArr.map((ef) => {
-            const totalScore = computeTotal(ef.scores, this.state.weights)
-            extractedLinesScores[ef.index] = {
-                total: totalScore,
-                text: ef.line.text,
-                scores: ef.scores,
-                weights: this.state.weights
-            }
-            minScore = Math.min(totalScore, minScore)
-            maxScore = Math.max(totalScore, maxScore)
+        const lineScores = extractedArr.map(ef => ({
+            index: ef.index,
+            computedTotal: computeTotal(ef.scores, ef.weights, this.state.selectedWeights),
+            scoreWidth: computeScoreWidth(ef.scores, ef.weights, this.state.selectedWeights),
+            text: ef.line.text,
+        }))
+
+        lineScores.sort((a, b) => b.computedTotal - a.computedTotal)
+        let lineScoresRanked = {}
+
+        lineScores.map((lineScore, i) => {
+            lineScore.rank = i + 1
+            lineScoresRanked[lineScore.index] = lineScore
         })
+        const maxScore = lineScores[0].computedTotal
+        const minScore = lineScores[lineScores.length - 1].computedTotal
         const scoreDiff = maxScore - minScore
 
         let lineStates = {
             'base': {
-                'backgroundColor': 'rgba(0, 0, 0, 0.15)',
+                'style': {
+                    'backgroundColor': 'rgba(0, 0, 0, 0.15)'
+                },
                 'showTooltip': true,
-            }
+            },
+            'baseExpected': {
+                'style': {
+                    'backgroundColor': 'rgba(0, 0, 0, 0.15)',
+                    'outline': '#066d10 dashed 3px'
+                },
+                'showTooltip': true,
+            },
         }
-        let lineStateArr = page.lines.map((l, idx) => {
-            const lineScore = extractedLinesScores[idx]
+
+        const docLabels = this.props.labels[this.state.docIndex]
+        const expected = docLabels[this.state.fieldName]
+
+        const lineStateArr = page.lines.map((l, idx) => {
+            const lineScore = lineScoresRanked[idx]
             if (lineScore !== undefined) {
-                const green = (maxScore - lineScore.total) / scoreDiff * 255
+                const green = (maxScore - lineScore.computedTotal) / scoreDiff * 255
                 const newState = idx
+                const isSelected = this.state.selectedLines.includes(idx)
+                let style = {
+                    'backgroundColor': `rgba(255, ${green}, 0, 0.4)`
+                }
+                if (l.text.includes(expected)) style['outline'] = '#066d10 dashed 3px'
+                if (isSelected) style['border'] = '2px solid rgba(115, 146, 245, 0.9)'
 
                 lineStates[newState] = {
-                    'backgroundColor': `rgba(255, ${green}, 0, 0.4)`,
-                    'showTooltip': true,
+                    'style': style,
+                    'showTooltip': false,
+                    'popoverLock': isSelected,
                     'popover': (
                         <div className='card ocr-card'>
                             <div className='card-body'>
-                                <div className='form-group'>
-                                    { scoreBreakdown(lineScore.scores, lineScore.weights) }
-                                    <label class='form-label'>Total Score: {(lineScore.total * 100).toFixed(2)}</label>
-                                </div>
+                                { scoreBreakdown(lineScore.scoreWidth) }
+                                <label class='form-label' style={{marginBottom: 0, paddingBottom: 0}}>
+                                    Total Score: {(lineScore.computedTotal * 100).toFixed(2)} &emsp; Rank: {lineScore.rank}
+                                    <br />
+                                    Text: {lineScore.text}
+                                </label>
                             </div>
                         </div>
                     )
                 }
                 return newState
+            } else if (l.text.includes(expected)) {
+                return 'baseExpected'
             } else {
                 return 'base'
             }
@@ -216,10 +219,24 @@ class ExtractionHeatmap extends React.Component {
             page={page}
             showImg={true}
             showLines={true}
+            lineOnClick={evt => {this.lineClickHandler(evt)}}
             lineStateArr={lineStateArr}
             lineStates={lineStates}
             scale={scale}
         />)
+    }
+
+    lineClickHandler(evt) {
+        const lineIdx = Number(evt.target.getAttribute('line-index'))
+        this.setState(prevState => {
+            let selectedLines = prevState.selectedLines
+            const lineIdxIdx = selectedLines.indexOf(lineIdx)
+            if (lineIdxIdx != -1) selectedLines.splice(lineIdxIdx, 1)
+            else selectedLines.push(lineIdx)
+            return {
+                'selectedLines': selectedLines
+            }
+        })
     }
 
     render() {
@@ -236,40 +253,27 @@ class ExtractionHeatmap extends React.Component {
                         { this.renderExpectedValue() }
                     </div>
                 </div>
-                { this.renderWeightAdjuster() }
-                <div style={{marginTop: 20}}>
-                    { this.renderHeatmap() }
-                </div>
+                { this.renderWeightSelect() }
+                { this.renderHeatmap() }
             </div>
         )
     }
 }
 
-function scoreBreakdown(rawScores, weights) {
-    const scoreKeys = Object.keys(rawScores)
+function scoreBreakdown(scoreWidth) {
+    const scoreKeys = Object.keys(scoreWidth)
     return (
-        <div>
-            <div className='bar'>
-                { scoreKeys.map((key, i) => {
-                    const rscore = rawScores[key]
-                    const weight = weights[key]
-                    const score = (rscore * weight * 100).toFixed(0)
-                    const bgColor = COLOR_LIST[i % COLOR_LIST.length]
-                    return (
-                        <div 
-                            key={key}
-                            className='bar-item hyper-tooltip'
-                            style={{
-                                width: `${score}%`,
-                                backgroundColor: bgColor
-                            }}
-                            data-hyper-tooltip={key}
-                        >
-                            {score}
-                        </div>
-                    )
-                })}
-            </div>
+        <div className='bar'>
+            { scoreKeys.map((key, i) => (
+                <div 
+                    key={key}
+                    className={`bar-item hyper-tooltip color-${i % 4}`}
+                    style={{width: `${scoreWidth[key]}%`}}
+                    data-hyper-tooltip={key}
+                >
+                    {scoreWidth[key]}
+                </div>
+            ))}
         </div>
     )
 }
@@ -278,10 +282,18 @@ function deepcopy(obj) {
     return JSON.parse(JSON.stringify(obj))
 }
 
-function computeTotal(scores, weights) {
+function computeScoreWidth(scores, weights, selectedWeights) {
+    let scoreWidth = {}
+    for (const [key, score] of Object.entries(scores)) {
+        scoreWidth[key] = (selectedWeights[key]) ? Math.round(score * weights[key] * 100) : 0
+    }
+    return scoreWidth
+}
+
+function computeTotal(scores, weights, selectedWeights) {
     let sum = 0
     for (const [key, score] of Object.entries(scores)) {
-        sum += score * weights[key]
+        if (selectedWeights[key]) sum += score * weights[key] 
     }
     return sum
 }
