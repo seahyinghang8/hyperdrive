@@ -11,7 +11,7 @@ function SpatialTextLayout(props) {
             {
                 props.showLines && props.page.lines.map((line, idx) => {
                     const lineState = props.lineStates[props.lineStateArr[idx]]
-                    const bgColor = lineState['backgroundColor']
+                    const lineStyle = lineState['style']
                     const showTooltip = lineState['showTooltip']
                     const showText = lineState['showText']
                     const popover = lineState['popover']
@@ -28,6 +28,9 @@ function SpatialTextLayout(props) {
                         } else {
                             className += ' hyper-popover-top'
                         }
+                        if (lineState['popoverLock']) {
+                            className += ' lock'
+                        }
                     }
                     return (
                         <div 
@@ -39,7 +42,7 @@ function SpatialTextLayout(props) {
                             data-hyper-tooltip={line.text}
                         >
                             <div
-                                style={getLineTextStyle(line, props.scale, bgColor)}
+                                style={getLineTextStyle(line, props.scale, lineStyle)}
                                 line-index={idx}
                             >
                                 { showText && line.text }
@@ -74,17 +77,19 @@ function getLinePosStyle(line, scale) {
     }
 }
 
-function getLineTextStyle(line, scale, color) {
+function getLineTextStyle(line, scale, lineStyle) {
+    const style = deepcopy(lineStyle)
     const fontHeight = line.height * FONT_SIZE_SCALE * scale
     const fontWidth = line.width * scale / line.text.length / FONT_SIZE_TO_PIXEL_WIDTH
-    const fontSize = Math.min(fontHeight, fontWidth)
-    return {
-        width: line.width * scale,
-        height: line.height * scale,
-        lineHeight: `${line.height * scale}px`,
-        fontSize: fontSize,
-        backgroundColor: color,
-    }
+    style['fontSize'] = Math.min(fontHeight, fontWidth)
+    style['width'] = line.width * scale
+    style['height'] = line.height * scale
+    style['lineHeight'] =  `${line.height * scale}px`
+    return style
+}
+
+function deepcopy(obj) {
+    return JSON.parse(JSON.stringify(obj))
 }
 
 export default SpatialTextLayout

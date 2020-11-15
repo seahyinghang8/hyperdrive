@@ -12,12 +12,16 @@ class OCRVisualizer extends React.Component {
 
         this.lineStates = {
             0: {
-                'backgroundColor': 'rgba(0, 0, 0, 0.1)',
+                'style': {
+                    'backgroundColor': 'rgba(0, 0, 0, 0.1)'
+                },
                 'showTooltip': true,
                 'showText': true
             },
             1: {
-                'backgroundColor': 'rgba(0, 255, 113, 0.5)',
+                'style': {
+                    'backgroundColor': 'rgba(115, 146, 245, 0.5)'
+                },
                 'showTooltip': true,
                 'showText': true
             },
@@ -41,7 +45,6 @@ class OCRVisualizer extends React.Component {
     }           
 
     lineClickHandler(evt) {
-        // if line state between 0 and 1
         const lineIdx = Number(evt.target.getAttribute('line-index'))
         let selectedLines = this.props.selectedLines
         if (this.state.lineStateArr[lineIdx] == 1) {
