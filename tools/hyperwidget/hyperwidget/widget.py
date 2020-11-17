@@ -16,7 +16,7 @@ class OCRVisualizer(widgets.DOMWidget):
         '^{{ cookiecutter.npm_package_version }}'
     ).tag(sync=True)
 
-    page = Dict().tag(sync=True)
+    document = Dict().tag(sync=True)
     selected_lines = List([]).tag(sync=True)
 
 
@@ -49,6 +49,6 @@ class ExtractionHeatmap(widgets.DOMWidget):
         '^{{ cookiecutter.npm_package_version }}'
     ).tag(sync=True)
 
-    pages = List().tag(sync=True)
+    documents = List().tag(sync=True)
     labels = List().tag(sync=True)
     extracted_fields = List().tag(sync=True)

@@ -1,7 +1,6 @@
 import os
 import pandas as pd
 from typing import Any, List, Dict
-import pdf2image
 
 try:
     from PIL import Image
@@ -12,15 +11,18 @@ from models.document import Document
 from models.spatial_text import Page
 
 from utils.cluster import cluster_text
-from utils.parser import process_image
+from utils.parser import process_image, process_pdf
 
 
 # Dataloader employs lazy loading
 class Dataloader:
     def __init__(self, data_dir: str, label_path: str,
-                 extensions: List[str] = ['jpg']):
+                 concatenate_pages: bool = False,
+                 extensions: List[str] = ['pdf', 'jpg']):
         # data_dir is the directory containing all the images
         # label_path is the path to the csv file
+        # concatenate_pages if set true will combine the non-empty
+        # pages in a single doc into one long page doc
         # extensions is a list of the formats of the input data
         if not os.path.exists(data_dir):
             raise ValueError(f'data_dir \'{data_dir}\' does not exist')
@@ -32,6 +34,7 @@ class Dataloader:
         self._data_dir = data_dir
         self._label = pd.read_csv(label_path)
         self._extensions = [ext.lower() for ext in extensions]
+        self._concatenate_pages = concatenate_pages
         self._cache: Dict[int, dict] = {}
 
     def _load_data(self, idx: int) -> dict:
@@ -41,15 +44,32 @@ class Dataloader:
         for ext in self._extensions:
             path = os.path.join(self._data_dir, basename + '.' + ext)
             if os.path.exists(path):
-                images = []
+                filename = basename + '.' + ext
+                doc = None
                 # image types
                 if ext in ['jpg', 'png']:
-                    images = [Image.open(path)]
-                elif ext in ['pdf']:
-                    images = pdf2image.convert_from_path(path)
+                    page_image = Image.open(path)
+                    pdf_pages = [
+                        Page(
+                            lines=cluster_text(
+                                process_image(page_image),
+                                page_image
+                            ),
+                            width=page_image.width,
+                            height=page_image.height
+                        )
+                    ]
+                    doc = Document(pdf_pages, path)
+                elif ext in ['pdf']:  # pdf type
+                    doc = process_pdf(path)
+                    if self._concatenate_pages:
+                        doc.concatenate_pages()
                 else:
                     raise ValueError(f'Extension {ext} is not accepted.')
-                return {'images': images, 'label': label, 'filename': basename + '.' + ext}
+                return {
+                    'label': label,
+                    'document': doc
+                }
 
         raise ValueError(f'file with basename {basename}\
             ({"|".join(self._extensions)}) cannot be found')
@@ -59,13 +79,6 @@ class Dataloader:
             return self._cache[idx]['document']
 
         data = self._load_data(idx)
-        pdf_pages = [
-            Page(
-                lines=cluster_text(process_image(page_image), page_image),
-                image=page_image
-            ) for page_image in data['images']
-        ]
-        data['document'] = Document(data['filename'], pdf_pages)
         self._cache[idx] = data
 
         return data['document']

@@ -1,4 +1,4 @@
-from typing import List, Dict
+from typing import List, Dict, Tuple, Any
 from rapidfuzz import fuzz
 
 from models.field import ExtractedField
@@ -8,9 +8,9 @@ def evaluate_output(
     extracted_fields: List[dict],
     ground_truths: List[dict],
     fields: List[str]
-) -> Dict[str, List[tuple]]:
+) -> Dict[str, List[Tuple[int, str, str]]]:
     # Return all the errors
-    errors: Dict[str, List[tuple]] = {}
+    errors: Dict[str, List[Tuple[int, str, str]]] = {}
 
     for field in fields:
         outputs = [

@@ -40,7 +40,7 @@ class ExtractionHeatmap extends React.Component {
     }           
 
     renderDocSelect() {
-        const numDocs = this.props.pages.length
+        const numDocs = this.props.documents.length
         
         return (
             <div class="hyper-input-group">
@@ -135,9 +135,9 @@ class ExtractionHeatmap extends React.Component {
     }
 
     renderHeatmap() {
-        const page = this.props.pages[this.state.docIndex]
+        const page = this.props.documents[this.state.docIndex].pages[0]
+        const image = this.props.documents[this.state.docIndex].images[0]
         let scale = (this.state.windowWidth - 30) / Number(page.width)
-        if (scale > 1) scale = 1
 
         const extractedDict = this.props.extractedFields[this.state.docIndex]
         const extractedArr = extractedDict[this.state.fieldName]
@@ -217,6 +217,7 @@ class ExtractionHeatmap extends React.Component {
 
         return (<SpatialTextLayout
             page={page}
+            image={image}
             showImg={true}
             showLines={true}
             lineOnClick={evt => {this.lineClickHandler(evt)}}

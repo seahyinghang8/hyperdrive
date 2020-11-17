@@ -5,7 +5,12 @@ try:
 except ImportError:
     import Image
 
-from models.spatial_text import Line, Word
+from pdfminer.high_level import extract_pages
+from pdfminer.layout import LTTextContainer, LTTextLine, LTChar
+from pdfminer.layout import LTRect, LTLine, LTFigure
+
+from models.spatial_text import Line, Word, Page
+from models.document import Document
 from utils.img_preprocess import ocr_preprocess
 
 
@@ -38,7 +43,7 @@ def _parse_tesseract_data(data_str: str) -> List[Line]:
                 curr_line = lines[-1]
         new_word = Word(
             text=text,
-            confidence=int(word_info_split[10]),
+            confidence=float(word_info_split[10]),
             left=int(word_info_split[6]),
             top=int(word_info_split[7]),
             width=int(word_info_split[8]),
@@ -46,3 +51,81 @@ def _parse_tesseract_data(data_str: str) -> List[Line]:
         )
         curr_line.append(new_word)
     return lines
+
+
+# Process pdf using pdfminer
+def process_pdf(path: str) -> Document:
+    pages = []
+    for page_layout in extract_pages(path):
+        lines = []
+        for element in page_layout:
+            if isinstance(element, LTTextContainer):
+                lines += _get_lines(element, page_layout.height)
+            elif isinstance(element, LTRect):
+                pass    # For the future Rectangles
+            elif isinstance(element, LTLine):
+                pass    # For the future Lines
+            elif isinstance(element, LTFigure):
+                pass    # For the future Figures
+        pages.append(Page(lines, page_layout.width, page_layout.height))
+
+    return Document(pages, path)
+
+
+def _get_lines(text_box: LTTextContainer, page_height: int) -> List[Line]:
+    return [_convert_to_spatial_line(tl, page_height) for tl in text_box]
+
+
+def _convert_to_spatial_line(text_line: LTTextLine, page_height: int) -> Line:
+    curr = _empty_curr_word()
+    words = []
+
+    for char in text_line:
+        char_text = char.get_text() if isinstance(char, LTChar) else ' '
+
+        if char_text == ' ':
+            if curr['started']:
+                new_word = _convert_curr_to_word(curr, page_height)
+                words.append(new_word)
+                curr = _empty_curr_word()
+        else:
+            if not curr['started']:
+                curr['left'] = char.x0
+                curr['bottom'] = char.y0
+                curr['started'] = True
+            curr['top'] = max(curr['top'], char.y1)
+            curr['right'] = max(curr['right'], char.x1)
+            curr['bottom'] = min(curr['bottom'], char.y0)
+            curr['text'] += char_text
+            curr['font'] = char.fontname
+
+    if curr['started']:
+        new_word = _convert_curr_to_word(curr, page_height)
+        words.append(new_word)
+    return Line(words)
+
+
+def _convert_curr_to_word(curr: dict, page_height: int) -> Word:
+    width = int(curr['right'] - curr['left'])
+    height = int(curr['top'] - curr['bottom'])
+    return Word(
+        text=curr['text'],
+        confidence=1.,
+        left=int(curr['left']),
+        top=int(page_height - curr['top']),
+        width=width,
+        height=height,
+        font=curr['font']
+    )
+
+
+def _empty_curr_word() -> dict:
+    return {
+        'text': '',
+        'font': '',
+        'left': 0.,
+        'right': 0.,
+        'top': 0.,
+        'bottom': 0.,
+        'started': False
+    }

@@ -6,7 +6,9 @@ import './OCRVisualizer.css'
 class OCRVisualizer extends React.Component {
     constructor(props) {
         super(props)
-        const lineStateArr = this.props.page.lines.map((l, idx) => (
+        this.page1 = this.props.document.pages[0]
+        this.image1 = this.props.document.images[0]
+        const lineStateArr = this.page1.lines.map((l, idx) => (
             props.selectedLines.includes(idx) ? 1 : 0
         ))
 
@@ -39,7 +41,7 @@ class OCRVisualizer extends React.Component {
         setTimeout(
             () => {
                 this.setState({
-                    scale: (this.container.offsetWidth - 30) / Number(this.props.page.width)
+                    scale: (this.container.offsetWidth - 30) / Number(this.page1.width)
                 })
             }, 10)
     }           
@@ -71,7 +73,8 @@ class OCRVisualizer extends React.Component {
         }
 
         return (<SpatialTextLayout
-            page={this.props.page}
+            page={this.page1}
+            image={this.image1}
             lineStateArr={this.state.lineStateArr}
             lineStates={this.lineStates}
             lineOnClick={evt => {this.lineClickHandler(evt)}}

@@ -153,7 +153,7 @@ def _score_entity(
 
 
 def _get_word_scores(
-    line:  Line,
+    line: Line,
     line_idxs: Set[int],
     lines: List[Line],
     word_neighbors: List[str],
@@ -162,10 +162,10 @@ def _get_word_scores(
     word_scores = [0. for _ in range(len(word_neighbors))]
     for line_idx in line_idxs:
         for i, wn in enumerate(word_neighbors):
-            word_score = 0
+            word_score = 0.
             neighboring_line_str = str(lines[line_idx])
             if (wn.lower() in neighboring_line_str.lower()):
-                word_score = 1
+                word_score = 1.
             else:
                 word_score = fuzzy_word_equal(wn, str(lines[line_idx]))
             cur_score = (
@@ -198,6 +198,7 @@ def _score_near_words(
     return _get_word_scores(
         line, valid_line_idxs, page.lines, word_neighbors, page)
 
+
 def get_nearby_words(
     line: Line,
     page: Page,
@@ -209,6 +210,7 @@ def get_nearby_words(
     valid_left_lines = set([])
     valid_top_lines = set([])
     j = 1
+
     def _get_comp_left_dist(idx: int) -> int:
         return abs(line.left - page.left_pos[idx][0])
 
@@ -222,11 +224,11 @@ def get_nearby_words(
         upper_idx = left_idx + j
         exceeded = True
         if (lower_idx > 0 and
-            _get_comp_left_dist(lower_idx) < left_thres):
+                _get_comp_left_dist(lower_idx) < left_thres):
             valid_left_lines.add(page.left_pos[lower_idx][1])
             exceeded = False
         if (upper_idx < len(page.lines) and 
-                 _get_comp_left_dist(upper_idx) < left_thres):
+                _get_comp_left_dist(upper_idx) < left_thres):
             valid_left_lines.add(page.left_pos[upper_idx][1])
             exceeded = False
         if exceeded:
@@ -239,7 +241,7 @@ def get_nearby_words(
         upper_idx = top_idx + j
         exceeded = True
         if (lower_idx > 0 and
-            _get_comp_top_dist(lower_idx) < top_thres):
+                _get_comp_top_dist(lower_idx) < top_thres):
             valid_top_lines.add(page.top_pos[lower_idx][1])
             exceeded = False
         if (upper_idx < len(page.lines) and
@@ -250,5 +252,9 @@ def get_nearby_words(
             break
         j += 1
     valid_lines = valid_left_lines & valid_top_lines
-    valid_lines = {vl for vl in valid_lines if str(page.lines[vl]) != str(line)}
+    valid_lines = {
+        vl
+        for vl in valid_lines
+        if str(page.lines[vl]) != str(line)
+    }
     return valid_lines
