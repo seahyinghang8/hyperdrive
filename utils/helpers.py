@@ -26,7 +26,7 @@ def convert_to_b64_image(image: Image) -> str:
 
 
 def extracted_fields_serialized(
-    extracted_fields: List[ExtractedField]
+    extracted_fields: List[dict]
 ) -> list:
     return [
         {

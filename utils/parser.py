@@ -100,7 +100,7 @@ def _convert_to_spatial_line(text_line: LTTextLine, page_height: int) -> Line:
             curr['font'] = char.fontname
 
     if curr['started']:
-        new_word = _convert_curr_to_word(curr)
+        new_word = _convert_curr_to_word(curr, page_height)
         words.append(new_word)
     return Line(words)
 
