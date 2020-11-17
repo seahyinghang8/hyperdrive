@@ -4,6 +4,7 @@ import _ from 'lodash';
 import OCRVisualizer from './components/OCRVisualizer'
 import ErrorTable from './components/ErrorTable'
 import ExtractionHeatmap from './components/ExtractionHeatmap'
+import MultiDocGen from './components/MultiDocGen'
 
 import './widget.css'
 
@@ -90,6 +91,37 @@ export class ExtractionHeatmapView extends DOMWidgetView {
                     pages: this.model.get('pages'),
                     labels: this.model.get('labels'),
                     extractedFields: this.model.get('extracted_fields')
+                }),
+            this.el,
+        )
+    }
+}
+
+export class MultiDocGenModel extends DOMWidgetModel {
+    defaults () {
+        return {
+            ...super.defaults(),
+            _model_name : 'MultiDocGenModel',
+            _view_name : 'MultiDocGenView',
+            _model_module : 'hyperwidget',
+            _view_module : 'hyperwidget',
+            _model_module_version : '0.1.0',
+            _view_module_version : '0.1.0'
+        }    
+    }
+}
+
+
+export class MultiDocGenView extends DOMWidgetView {
+    render() {
+        ReactDOM.render(
+            React.createElement(
+                MultiDocGen, {
+                    pages: this.model.get('pages'),
+                    setSelectedLines: selectedLines => {
+                        this.model.set('selected_lines', selectedLines)
+                        this.model.save_changes()
+                    }
                 }),
             this.el,
         )

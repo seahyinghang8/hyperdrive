@@ -52,3 +52,18 @@ class ExtractionHeatmap(widgets.DOMWidget):
     pages = List().tag(sync=True)
     labels = List().tag(sync=True)
     extracted_fields = List().tag(sync=True)
+
+class MultiDocGen(widgets.DOMWidget):
+    _model_name = Unicode('MultiDocGenModel').tag(sync=True)
+    _view_name = Unicode('MultiDocGenView').tag(sync=True)
+    _view_module = Unicode('hyperwidget').tag(sync=True)
+    _view_module_version = Unicode('^0.1.0').tag(sync=True)
+    _model_module = Unicode('hyperwidget').tag(sync=True)
+    _model_module_version = Unicode('^0.1.0').tag(sync=True)
+    # Version of the front-end module containing widget model
+    _model_module_version = Unicode(
+        '^{{ cookiecutter.npm_package_version }}'
+    ).tag(sync=True)
+
+    pages = List().tag(sync=True)
+    selected_lines = Dict().tag(sync=True)
