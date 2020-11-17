@@ -17,9 +17,12 @@ from utils.parser import process_image, process_pdf
 # Dataloader employs lazy loading
 class Dataloader:
     def __init__(self, data_dir: str, label_path: str,
+                 concatenate_pages: bool = False,
                  extensions: List[str] = ['pdf', 'jpg']):
         # data_dir is the directory containing all the images
         # label_path is the path to the csv file
+        # concatenate_pages if set true will combine the non-empty
+        # pages in a single doc into one long page doc
         # extensions is a list of the formats of the input data
         if not os.path.exists(data_dir):
             raise ValueError(f'data_dir \'{data_dir}\' does not exist')
@@ -31,6 +34,7 @@ class Dataloader:
         self._data_dir = data_dir
         self._label = pd.read_csv(label_path)
         self._extensions = [ext.lower() for ext in extensions]
+        self._concatenate_pages = concatenate_pages
         self._cache: Dict[int, dict] = {}
 
     def _load_data(self, idx: int) -> dict:
@@ -58,6 +62,8 @@ class Dataloader:
                     doc = Document(pdf_pages, path)
                 elif ext in ['pdf']:  # pdf type
                     doc = process_pdf(path)
+                    if self._concatenate_pages:
+                        doc.concatenate_pages()
                 else:
                     raise ValueError(f'Extension {ext} is not accepted.')
                 return {

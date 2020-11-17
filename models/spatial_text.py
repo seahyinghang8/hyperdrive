@@ -75,6 +75,10 @@ class Word(SpatialText):
     def __len__(self) -> int:
         return len(self.text)
 
+    def update_top(self, new_top: int):  # type: ignore
+        self._top = new_top
+        return self
+
     @property
     def text(self) -> str:
         return self._text
