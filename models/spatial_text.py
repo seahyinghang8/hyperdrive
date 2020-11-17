@@ -1,13 +1,5 @@
 from typing import List, Tuple, Optional, Dict, Any
 
-try:
-    from PIL import Image
-except ImportError:
-    import Image
-
-import base64
-from io import BytesIO
-
 
 # Definition of a Spatial Text class
 # Spatial text are text that contains information
@@ -58,9 +50,9 @@ NEGATIVE_VAL_ERROR = "Expected attribute '{}' to be >= 0. Actual value: {}"
 
 # Definition of a Word class
 class Word(SpatialText):
-    def __init__(self, text: str = '', confidence: int = 0,
+    def __init__(self, text: str = '', confidence: float = 0,
                  left: int = 0, top: int = 0,
-                 width: int = 0, height: int = 0):
+                 width: int = 0, height: int = 0, font: str = ''):
         if (left < 0):
             raise ValueError(NEGATIVE_VAL_ERROR.format('left', left))
         if (top < 0):
@@ -72,7 +64,7 @@ class Word(SpatialText):
 
         super().__init__(left, top, width, height)
         self._text: str = text
-        self._confidence: int = confidence
+        self._confidence: float = confidence
 
     def __str__(self) -> str:
         return self.text
@@ -235,23 +227,11 @@ class Block(SpatialText):
         return self._lines
 
 
-# Helper function to convert image to b64 encoding
-def convert_to_b64_image(image: Image) -> str:
-    in_mem_file = BytesIO()
-    image.save(in_mem_file, format="PNG")
-    in_mem_file.seek(0)
-    img_bytes = in_mem_file.read()
-    base64_encoded_result_bytes = base64.b64encode(img_bytes)
-    base64_encoded_result_str = base64_encoded_result_bytes.decode('ascii')
-    return base64_encoded_result_str
-
-
 # Definition of a Page class
 class Page(SpatialText):
-    def __init__(self, lines: List[Line], image: Image):
-        super().__init__(0, 0, 0, 0)
+    def __init__(self, lines: List[Line], width: int, height: int):
+        super().__init__(0, 0, width, height)
         self._lines = lines
-        self._image = image
         self._compute_page_metadata()
         self._compute_spatial_metadata()
 
@@ -262,10 +242,11 @@ class Page(SpatialText):
         # ensure that all the spatial metadata are initialized
         self._left = min([ln.left for ln in self._lines])
         self._top = min([ln.top for ln in self._lines])
-        self._width = self.image.width
-        self._height = self.image.height
 
     def _compute_page_metadata(self) -> None:
+        if len(self._lines) == 0:
+            return
+
         self._left_pos: List[Tuple[int, int]]
         self._top_pos: List[Tuple[int, int]]
         self._right_pos: List[Tuple[int, int]]
@@ -296,13 +277,12 @@ class Page(SpatialText):
 
     def as_dict(self) -> dict:
         return {
-            'width': self.width,
-            'height': self.height,
-            'b64_image': convert_to_b64_image(self.image),
             'lines': [
                 line.as_dict()
                 for line in self.lines
-            ]
+            ],
+            'width': self.width,
+            'height': self.height
         }
 
     @property
@@ -316,7 +296,3 @@ class Page(SpatialText):
     @property
     def top_pos(self) -> List[Tuple[int, int]]:
         return self._top_pos
-
-    @property
-    def image(self) -> Image:
-        return self._image
