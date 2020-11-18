@@ -63,7 +63,7 @@ def _gen_entity(
                 max_score = entity_score
                 best_label = cur_label
         if best_label not in score_dict:
-            score_dict[best_label]  = 0
+            score_dict[best_label] = 0
         score_dict[best_label] += max_score
     best_scoring_label = max(score_dict.items(), key=operator.itemgetter(1))[0]
     return best_scoring_label
@@ -73,8 +73,12 @@ def _gen_position(
     lines: List[Line],
     pages: List[Page]
 ) -> Tuple[float, float]:
-    x_pos = sum([lines[i].center_left / pages[i].width for i in range(len(lines))])
-    y_pos = sum([lines[i].center_top / pages[i].height for i in range(len(lines))])
+    x_pos = sum([
+        lines[i].center_left / pages[i].width for i in range(len(lines))
+    ])
+    y_pos = sum([
+        lines[i].center_top / pages[i].height for i in range(len(lines))
+    ])
     return (x_pos / len(pages), y_pos / len(pages))
 
 
@@ -89,7 +93,10 @@ def _gen_word_neighbors(
         line, page = lines[i], pages[i]
         line_idxs = get_nearby_words(line, page, top_thres, left_thres)
         line_strs = set(
-            itertools.chain(*[str(page.lines[i]).split(' ') for i in line_idxs])
+            itertools.chain(
+                *[str(page.lines[i]).split(' ')
+                  for i in line_idxs]
+            )
         )
         line_str_sets.append(line_strs)
     return list(set.intersection(*line_str_sets))
