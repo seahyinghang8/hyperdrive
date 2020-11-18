@@ -289,7 +289,7 @@ function scoreBreakdown(scoreWidth) {
                     style={{width: `${scoreWidth[key]}%`}}
                     data-hyper-tooltip={key}
                 >
-                    {scoreWidth[key]}
+                    {scoreWidth[key].toFixed(1)}
                 </div>
             ))}
         </div>
@@ -303,7 +303,7 @@ function deepcopy(obj) {
 function computeScoreWidth(scores, weights, selectedWeights) {
     let scoreWidth = {}
     for (const [key, score] of Object.entries(scores)) {
-        scoreWidth[key] = (selectedWeights[key]) ? Math.round(score * weights[key] * 100) : 0
+        scoreWidth[key] = (selectedWeights[key]) ? score * weights[key] * 100 : 0
     }
     return scoreWidth
 }
