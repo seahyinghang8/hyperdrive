@@ -80,7 +80,6 @@ class MultiDocGen extends React.Component {
         const page = this.props.documents[this.state.docIndex].pages[0]
         const image = this.props.documents[this.state.docIndex].images[0]
         let scale = (this.state.windowWidth - 30) / Number(page.width)
-        if (scale > 1) scale = 1
 
         const lineStateArr = page.lines.map((l, idx) => {
             let doclines = this.state.selectedLines[this.state.docIndex]
