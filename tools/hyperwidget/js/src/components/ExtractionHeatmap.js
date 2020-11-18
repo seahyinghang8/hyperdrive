@@ -145,7 +145,7 @@ class ExtractionHeatmap extends React.Component {
             index: ef.index,
             computedTotal: computeTotal(ef.scores, ef.weights, this.state.selectedWeights),
             scoreWidth: computeScoreWidth(ef.scores, ef.weights, this.state.selectedWeights),
-            text: ef.line.text,
+            text: lineDictToLine(ef.line).text,
         }))
 
         lineScores.sort((a, b) => b.computedTotal - a.computedTotal)
@@ -178,7 +178,8 @@ class ExtractionHeatmap extends React.Component {
         const docLabels = this.props.labels[this.state.docIndex]
         const expected = docLabels[this.state.fieldName]
 
-        const lineStateArr = page.lines.map((l, idx) => {
+        const lineStateArr = page.lines.map((line_dict, idx) => {
+            const line = lineDictToLine(line_dict)
             const lineScore = lineScoresRanked[idx]
             if (lineScore !== undefined) {
                 const green = (maxScore - lineScore.computedTotal) / scoreDiff * 255
@@ -187,7 +188,7 @@ class ExtractionHeatmap extends React.Component {
                 let style = {
                     'backgroundColor': `rgba(255, ${green}, 0, 0.4)`
                 }
-                if (l.text.includes(expected)) style['outline'] = '#066d10 dashed 3px'
+                if (line.text.includes(expected)) style['outline'] = '#066d10 dashed 3px'
                 if (isSelected) style['border'] = '2px solid rgba(115, 146, 245, 0.9)'
 
                 lineStates[newState] = {
@@ -258,6 +259,22 @@ class ExtractionHeatmap extends React.Component {
                 { this.renderHeatmap() }
             </div>
         )
+    }
+}
+
+function lineDictToLine(line_dict) {
+    const words = line_dict['words']
+    const text = words.map(w => w.text).join(' ')
+    const left = Math.min(...words.map(w => w.left))
+    const top = Math.min(...words.map(w => w.top))
+    const right = Math.max(...words.map(w => w.left + w.width))
+    const bottom = Math.max(...words.map(w => w.top + w.height))
+    return {
+        'text': text,
+        'left': left,
+        'top': top,
+        'width': right - left,
+        'height': bottom - top
     }
 }
 

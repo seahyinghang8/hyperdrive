@@ -50,9 +50,10 @@ NEGATIVE_VAL_ERROR = "Expected attribute '{}' to be >= 0. Actual value: {}"
 
 # Definition of a Word class
 class Word(SpatialText):
-    def __init__(self, text: str = '', confidence: float = 0,
+    def __init__(self, text: str = '', c: float = 1.,
                  left: int = 0, top: int = 0,
-                 width: int = 0, height: int = 0, font: str = ''):
+                 width: int = 0, height: int = 0,
+                 ft: int = -1):
         if (left < 0):
             raise ValueError(NEGATIVE_VAL_ERROR.format('left', left))
         if (top < 0):
@@ -64,7 +65,8 @@ class Word(SpatialText):
 
         super().__init__(left, top, width, height)
         self._text: str = text
-        self._confidence: float = confidence
+        self._font_type: int = ft
+        self._confidence: float = c
 
     def __str__(self) -> str:
         return self.text
@@ -74,6 +76,21 @@ class Word(SpatialText):
 
     def __len__(self) -> int:
         return len(self.text)
+
+    def as_dict(self) -> dict:
+        return {
+            'text': self.text,
+            'left': self.left,
+            'top': self.top,
+            'width': self.width,
+            'height': self.height,
+            'c': self._confidence,
+            'ft': self._font_type,
+        }
+
+    @classmethod
+    def from_dict(cls, word_dict: dict):  # type: ignore
+        return cls(**word_dict)
 
     def update_top(self, new_top: int):  # type: ignore
         self._top = new_top
@@ -114,13 +131,11 @@ class Line(SpatialText):
         self._compute_spatial_metadata(new_word)
 
     def as_dict(self) -> dict:
-        return {
-            'height': self.height,
-            'width': self.width,
-            'left': self.left,
-            'top': self.top,
-            'text': str(self)
-        }
+        return {'words': [w.as_dict() for w in self.words]}
+
+    @classmethod
+    def from_dict(cls, line_dict: dict):  # type: ignore
+        return cls([Word.from_dict(w) for w in line_dict['words']])
 
     def __str__(self) -> str:
         return ' '.join(self._word_to_str_list())
@@ -288,6 +303,14 @@ class Page(SpatialText):
             'width': self.width,
             'height': self.height
         }
+
+    @classmethod
+    def from_dict(cls, page_dict: dict):  # type: ignore
+        return cls(
+            lines=[Line.from_dict(li) for li in page_dict['lines']],
+            width=page_dict['width'],
+            height=page_dict['height']
+        )
 
     @property
     def lines(self) -> List[Line]:

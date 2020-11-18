@@ -9,7 +9,8 @@ function SpatialTextLayout(props) {
     return (
         <div className='spatial-layout-container' style={getParentStyle(props.page, props.image, props.showImg, props.scale)}>
             {
-                props.showLines && props.page.lines.map((line, idx) => {
+                props.showLines && props.page.lines.map((line_dict, idx) => {
+                    const line = lineDictToLine(line_dict)
                     const lineState = props.lineStates[props.lineStateArr[idx]]
                     const lineStyle = lineState['style']
                     const showTooltip = lineState['showTooltip']
@@ -60,6 +61,22 @@ function SpatialTextLayout(props) {
     )
 }
 
+
+function lineDictToLine(line_dict) {
+    const words = line_dict['words']
+    const text = words.map(w => w.text).join(' ')
+    const left = Math.min(...words.map(w => w.left))
+    const top = Math.min(...words.map(w => w.top))
+    const right = Math.max(...words.map(w => w.left + w.width))
+    const bottom = Math.max(...words.map(w => w.top + w.height))
+    return {
+        'text': text,
+        'left': left,
+        'top': top,
+        'width': right - left,
+        'height': bottom - top
+    }
+}
 
 function getParentStyle(page, image, showImg, scale) {
     const imgUrl = showImg ? `data:image/jpeg;base64, ${image}` : ''
