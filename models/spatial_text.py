@@ -261,6 +261,8 @@ class Page(SpatialText):
         # ensure that all the spatial metadata are initialized
         self._left = min([ln.left for ln in self._lines])
         self._top = min([ln.top for ln in self._lines])
+        self._text_width = max([ln.right - self.left for ln in self._lines])
+        self._text_height = max([ln.bottom - self.top for ln in self._lines])
 
     def _compute_page_metadata(self) -> None:
         if len(self._lines) == 0:
@@ -323,3 +325,11 @@ class Page(SpatialText):
     @property
     def top_pos(self) -> List[Tuple[int, int]]:
         return self._top_pos
+
+    @property
+    def text_width(self) -> int:
+        return self._text_width
+
+    @property
+    def text_height(self) -> int:
+        return self._text_height

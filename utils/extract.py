@@ -122,7 +122,7 @@ def _score_x_position(
     position: float,
     page: Page
 ) -> float:
-    line_x = (line.center_left - page.left) / page.width
+    line_x = (line.center_left - page.left) / page.text_width
     return 1. - abs(line_x - position)
 
 
@@ -131,7 +131,7 @@ def _score_y_position(
     position: float,
     page: Page
 ) -> float:
-    line_y = (line.center_top - page.top) / page.height
+    line_y = (line.center_top - page.top) / page.text_height
     return 1. - abs(line_y - position)
 
 
@@ -182,8 +182,8 @@ def _dist_word_score(
     line_b: Line,
     page: Page,
 ) -> float:
-    y_score = 1. - abs(line_a.center_top - line_b.center_top) / page.height
-    x_score = 1. - abs(line_a.center_left - line_b.center_left) / page.width
+    y_score = 1. - abs(line_a.center_top - line_b.center_top) / page.text_height
+    x_score = 1. - abs(line_a.center_left - line_b.center_left) / page.text_width
     return (x_score + y_score) / 2.
 
 
@@ -218,8 +218,8 @@ def get_nearby_words(
     def _get_comp_top_dist(idx: int) -> int:
         return abs(line.top - page.top_pos[idx][0])
 
-    left_thres = norm_left_thres * page.width
-    top_thres = norm_top_thres * page.height
+    left_thres = norm_left_thres * page.text_width
+    top_thres = norm_top_thres * page.text_height
     while True:
         lower_idx = left_idx - j
         upper_idx = left_idx + j
