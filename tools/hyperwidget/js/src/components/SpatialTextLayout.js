@@ -7,7 +7,7 @@ const FONT_SIZE_SCALE = 0.9
 
 function SpatialTextLayout(props) {
     return (
-        <div className='spatial-layout-container' style={getParentStyle(props.page, props.showImg, props.scale)}>
+        <div className='spatial-layout-container' style={getParentStyle(props.page, props.image, props.showImg, props.scale)}>
             {
                 props.showLines && props.page.lines.map((line, idx) => {
                     const lineState = props.lineStates[props.lineStateArr[idx]]
@@ -61,8 +61,8 @@ function SpatialTextLayout(props) {
 }
 
 
-function getParentStyle(page, showImg, scale) {
-    const imgUrl = showImg ? `data:image/jpeg;base64, ${page.b64_image}` : ''
+function getParentStyle(page, image, showImg, scale) {
+    const imgUrl = showImg ? `data:image/jpeg;base64, ${image}` : ''
     return  {
         width: page.width * scale,
         height: page.height * scale,

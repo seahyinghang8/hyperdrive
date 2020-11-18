@@ -29,7 +29,7 @@ export class OCRVisualizerView extends DOMWidgetView {
         ReactDOM.render(
             React.createElement(
                 OCRVisualizer, {
-                    page: this.model.get('page'),
+                    document: this.model.get('document'),
                     selectedLines: this.model.get('selected_lines'),
                     setSelectedLines: selectedLines => {
                         this.model.set('selected_lines', Array.from(selectedLines))
@@ -88,7 +88,7 @@ export class ExtractionHeatmapView extends DOMWidgetView {
         ReactDOM.render(
             React.createElement(
                 ExtractionHeatmap, {
-                    pages: this.model.get('pages'),
+                    documents: this.model.get('documents'),
                     labels: this.model.get('labels'),
                     extractedFields: this.model.get('extracted_fields')
                 }),
@@ -117,7 +117,7 @@ export class MultiDocGenView extends DOMWidgetView {
         ReactDOM.render(
             React.createElement(
                 MultiDocGen, {
-                    pages: this.model.get('pages'),
+                    documents: this.model.get('documents'),
                     setSelectedLines: selectedLines => {
                         this.model.set('selected_lines', selectedLines)
                         this.model.save_changes()

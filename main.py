@@ -1,11 +1,8 @@
-from utils.parser import process_image
-from utils.cluster import cluster_text
 from utils.extract import extract_fields
 from utils.dataloader import Dataloader
 from utils.evaluator import evaluate_output
 
 import os
-
 
 if __name__ == "__main__":
     w2_sample_dir = os.path.join('data', 'sample', 'w2')
@@ -57,4 +54,5 @@ if __name__ == "__main__":
     ]
     labels = [dl.get_label(i) for i in range(num_docs)]
     evaluate_output(extracted_fields,
-                    labels, ['EIN', 'Medicare Tax withheld'])
+                    labels,
+                    ['EIN', 'Medicare Tax withheld'])

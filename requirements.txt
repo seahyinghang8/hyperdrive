@@ -12,3 +12,5 @@ pandas
 scipy
 spacy
 rapidfuzz
+pdfminer.six
+pyyaml
