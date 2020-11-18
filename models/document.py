@@ -12,10 +12,16 @@ from models.spatial_text import Page, Line, Word
 
 # Definition of a Document class
 class Document:
-    def __init__(self, pages: List[Page], path: str):
+    def __init__(
+        self,
+        pages: List[Page],
+        path: str,
+        font_list: List[str]
+    ):
         self._path = path
         self._filename = os.path.basename(path)
         self._pages = pages
+        self._font_list = font_list
         self._pages_concatenated = False
 
     def __repr__(self) -> str:
@@ -31,7 +37,8 @@ class Document:
         my_dict = {
             'path': self._path,
             'pages': [p.as_dict() for p in self._pages],
-            'pages_concatenated': self._pages_concatenated
+            'pages_concatenated': self._pages_concatenated,
+            'font_list': self._font_list
         }
         if self._pages_concatenated:
             my_dict['concatenated_indices'] = self._concatenated_indices
@@ -41,6 +48,18 @@ class Document:
         my_dict = self.as_dict()
         my_dict['images'] = self.b64_images
         return my_dict
+
+    @classmethod
+    def from_dict(cls, doc_dict: dict):  # type: ignore
+        doc = cls(
+            pages=[Page.from_dict(p) for p in doc_dict['pages']],
+            path=doc_dict['path'],
+            font_list=doc_dict['font_list']
+        )
+        if doc_dict['pages_concatenated']:
+            doc._pages_concatenated = True
+            doc._concatenated_indices = doc_dict['concatenated_indices']
+        return doc
 
     @property
     def filename(self) -> str:

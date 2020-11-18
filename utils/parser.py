@@ -43,11 +43,11 @@ def _parse_tesseract_data(data_str: str) -> List[Line]:
                 curr_line = lines[-1]
         new_word = Word(
             text=text,
-            confidence=float(word_info_split[10]),
             left=int(word_info_split[6]),
             top=int(word_info_split[7]),
             width=int(word_info_split[8]),
-            height=int(word_info_split[9])
+            height=int(word_info_split[9]),
+            c=float(word_info_split[10])
         )
         curr_line.append(new_word)
     return lines
@@ -56,11 +56,12 @@ def _parse_tesseract_data(data_str: str) -> List[Line]:
 # Process pdf using pdfminer
 def process_pdf(path: str) -> Document:
     pages = []
+    font_list: List[str] = []
     for page_layout in extract_pages(path):
         lines = []
         for element in page_layout:
             if isinstance(element, LTTextContainer):
-                lines += _get_lines(element, page_layout.height)
+                lines += _get_lines(element, page_layout.height, font_list)
             elif isinstance(element, LTRect):
                 pass    # For the future Rectangles
             elif isinstance(element, LTLine):
@@ -69,14 +70,25 @@ def process_pdf(path: str) -> Document:
                 pass    # For the future Figures
         pages.append(Page(lines, page_layout.width, page_layout.height))
 
-    return Document(pages, path)
+    return Document(pages, path, font_list)
 
 
-def _get_lines(text_box: LTTextContainer, page_height: int) -> List[Line]:
-    return [_convert_to_spatial_line(tl, page_height) for tl in text_box]
+def _get_lines(
+    text_box: LTTextContainer,
+    page_height: int,
+    font_list: List[str]
+) -> List[Line]:
+    return [
+        _convert_to_spatial_line(tl, page_height, font_list)
+        for tl in text_box
+    ]
 
 
-def _convert_to_spatial_line(text_line: LTTextLine, page_height: int) -> Line:
+def _convert_to_spatial_line(
+    text_line: LTTextLine,
+    page_height: int,
+    font_list: List[str]
+) -> Line:
     curr = _empty_curr_word()
     words = []
 
@@ -93,11 +105,15 @@ def _convert_to_spatial_line(text_line: LTTextLine, page_height: int) -> Line:
                 curr['left'] = char.x0
                 curr['bottom'] = char.y0
                 curr['started'] = True
+                if char.fontname in font_list:
+                    curr['font_type'] = font_list.index(char.fontname)
+                else:
+                    curr['font_type'] = len(font_list)
+                    font_list.append(char.fontname)
             curr['top'] = max(curr['top'], char.y1)
             curr['right'] = max(curr['right'], char.x1)
             curr['bottom'] = min(curr['bottom'], char.y0)
             curr['text'] += char_text
-            curr['font'] = char.fontname
 
     if curr['started']:
         new_word = _convert_curr_to_word(curr, page_height)
@@ -110,19 +126,18 @@ def _convert_curr_to_word(curr: dict, page_height: int) -> Word:
     height = int(curr['top'] - curr['bottom'])
     return Word(
         text=curr['text'],
-        confidence=1.,
         left=int(curr['left']),
         top=int(page_height - curr['top']),
         width=width,
         height=height,
-        font=curr['font']
+        ft=curr['font_type']
     )
 
 
 def _empty_curr_word() -> dict:
     return {
         'text': '',
-        'font': '',
+        'font': 0,
         'left': 0.,
         'right': 0.,
         'top': 0.,
