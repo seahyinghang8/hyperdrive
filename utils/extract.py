@@ -14,10 +14,11 @@ from utils.nlu import get_entity_scores, fuzzy_word_equal
 def extract_fields(
     doc: Document,
     field_queries: List[dict],
-    k: int = 1
+    k: int = 1,
+    nlp: English = None,
 ) -> Dict[str, List[ExtractedField]]:
-
-    nlp = spacy.load("en_core_web_sm")
+    if nlp is None:
+        nlp = spacy.load("en_core_web_sm")
     # iterate through all the pages
     top_k_fields_from_pages = [
         _get_top_k_fields_from_page(pg, field_queries, nlp, k)

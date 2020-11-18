@@ -14,3 +14,4 @@ spacy
 rapidfuzz
 pdfminer.six
 pyyaml
+iterextras
