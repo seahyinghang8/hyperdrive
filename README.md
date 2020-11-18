@@ -61,8 +61,9 @@ The javascript code should now be automatically updated.
 
 ## Sample Data
 
-Download the sample data from [here](https://drive.google.com/file/d/14Wdmii6le7KQDEW9T4eZD4emKbvdCjse/view).
-Create a folder `data/` in the project root folder and unzip the contents of the sample data there.
+Download the sample data from [here](https://drive.google.com/file/d/1vey_K4gS-yB_Zb-AvyifWzGDH6O4QY_X/view?usp=sharing).
+Download the full data from [here](https://drive.google.com/file/d/1Iv2PKdtzrfInyPbHMhoIZHZR8170zi3c/view?usp=sharing)
+Create a folder `data/` in the project root folder and unzip the contßents of the sample data there.
 
 ## Typechecking
 
