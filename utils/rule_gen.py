@@ -1,4 +1,5 @@
 import itertools
+import operator
 import spacy
 from spacy.lang.en import English
 
@@ -13,8 +14,8 @@ from utils.extract import get_nearby_words
 
 def generate_query(
     name: str,
-    line: Line,
-    page: Page,
+    lines: List[Line],
+    pages: List[Page],
     nlp: English = None
 ) -> Dict:
     if not nlp:
@@ -36,48 +37,59 @@ def generate_query(
             "word-neighbors": 0.25,
         }
     }
-    query["arguments"]["entity"] = _gen_entity(line, nlp)
-    x_pos, y_pos = _gen_position(line, page)
+    query["arguments"]["entity"] = _gen_entity(lines, nlp)
+    x_pos, y_pos = _gen_position(lines, pages)
     query["arguments"]["x-position"] = x_pos
     query["arguments"]["y-position"] = y_pos
     query["arguments"]['word-neighbors'] = _gen_word_neighbors(
-        line, page)
+        lines, pages)
     return query
 
 
 def _gen_entity(
-    line: Line,
+    lines: List[Line],
     nlp: English
 ) -> str:
-    doc = nlp(str(line))
-    entity_scores = get_entity_scores(nlp, doc)
-    max_score = 0
-    best_label = ""
-    for key in entity_scores:
-        entity_score = entity_scores[key]
-        _, _, cur_label = key
-        if entity_score > max_score:
-            max_score = entity_score
-            best_label = cur_label
-    return best_label
+    score_dict = {}
+    for line in lines:
+        doc = nlp(str(line))
+        entity_scores = get_entity_scores(nlp, doc)
+        max_score = 0
+        best_label = ""
+        for key in entity_scores:
+            entity_score = entity_scores[key]
+            _, _, cur_label = key
+            if entity_score > max_score:
+                max_score = entity_score
+                best_label = cur_label
+        if best_label not in score_dict:
+            score_dict[best_label]  = 0
+        score_dict[best_label] += max_score
+    best_scoring_label = max(score_dict.items(), key=operator.itemgetter(1))[0]
+    return best_scoring_label
 
 
 def _gen_position(
-    line: Line,
-    page: Page
+    lines: List[Line],
+    pages: List[Page]
 ) -> Tuple[float, float]:
-    return (
-        line.center_left / page.width,
-        line.center_top / page.height
-    )
+    x_pos = sum([lines[i].center_left / pages[i].width for i in range(len(lines))])
+    y_pos = sum([lines[i].center_top / pages[i].height for i in range(len(lines))])
+    return (x_pos / len(pages), y_pos / len(pages))
 
 
 def _gen_word_neighbors(
-    line: Line,
-    page: Page,
+    lines: List[Line],
+    pages: List[Page],
     top_thres: float = 0.05,
     left_thres: float = 0.1,
 ) -> List[str]:
-    line_idxs = get_nearby_words(line, page, top_thres, left_thres)
-    line_strs = [str(page.lines[i]).split(' ') for i in line_idxs]
-    return list(itertools.chain(*line_strs))
+    line_str_sets = []
+    for i in range(len(lines)):
+        line, page = lines[i], pages[i]
+        line_idxs = get_nearby_words(line, page, top_thres, left_thres)
+        line_strs = set(
+            itertools.chain(*[str(page.lines[i]).split(' ') for i in line_idxs])
+        )
+        line_str_sets.append(line_strs)
+    return list(set.intersection(*line_str_sets))

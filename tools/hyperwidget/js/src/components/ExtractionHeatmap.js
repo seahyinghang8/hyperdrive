@@ -128,7 +128,7 @@ class ExtractionHeatmap extends React.Component {
                                 </label>
                             </div>
                         </div>
-                        )
+                    )
                 })}
             </div>
         )
