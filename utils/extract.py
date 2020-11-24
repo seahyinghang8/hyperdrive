@@ -107,8 +107,10 @@ def _score_line(
                     line,
                     page,
                     query["arguments"]["word-neighbors"],
-                    query["arguments"]["word-neighbor-top-thres"],
-                    query["arguments"]["word-neighbor-left-thres"]
+                    query["arguments"]["word-neighbor-max-top-dist"],
+                    query["arguments"]["word-neighbor-max-left-dist"],
+                    query["arguments"]["word-neighbor-max-bottom-dist"],
+                    query["arguments"]["word-neighbor-max-right-dist"],
                 )
 
             }
@@ -158,17 +160,21 @@ def _get_word_scores(
     line_idxs: Set[int],
     lines: List[Line],
     word_neighbors: List[str],
-    page: Page
+    page: Page,
+    fuzzy_thres: int = 0.8
 ) -> float:
     word_scores = [0. for _ in range(len(word_neighbors))]
     for line_idx in line_idxs:
+        neighboring_line_str = str(lines[line_idx])
         for i, wn in enumerate(word_neighbors):
             word_score = 0.
-            neighboring_line_str = str(lines[line_idx])
             if (wn.lower() in neighboring_line_str.lower()):
                 word_score = 1.
             else:
-                word_score = fuzzy_word_equal(wn, str(lines[line_idx]))
+                word_score = fuzzy_word_equal(
+                    wn, neighboring_line_str)
+                if (word_score < fuzzy_thres):
+                    word_score = 0.
             cur_score = (
                 word_score *
                 _dist_word_score(lines[line_idx], line, page)
@@ -191,11 +197,14 @@ def _score_near_words(
     line: Line,
     page: Page,
     word_neighbors: List[str],
-    norm_top_thres: float,
-    norm_left_thres: float
+    max_top_dist: float,
+    max_left_dist: float,
+    max_bottom_dist: float,
+    max_right_dist: float
 ) -> float:
     valid_line_idxs = get_nearby_words(
-        line, page, norm_top_thres, norm_left_thres)
+        line, page, max_top_dist, max_left_dist, max_bottom_dist,
+        max_right_dist)
     return _get_word_scores(
         line, valid_line_idxs, page.lines, word_neighbors, page)
 
@@ -203,34 +212,36 @@ def _score_near_words(
 def get_nearby_words(
     line: Line,
     page: Page,
-    norm_top_thres: float,
-    norm_left_thres: float
+    max_top_dist: float,
+    max_left_dist: float,
+    max_bottom_dist: float,
+    max_right_dist: float
 ) -> Set[int]:
-    left_idx = bisect(page.left_pos, (line.left,))
-    top_idx = bisect(page.top_pos, (line.top,))
+    x_idx = bisect(page.center_left_pos, (line.center_left,))
+    y_idx = bisect(page.center_top_pos, (line.center_top,))
     valid_left_lines = set([])
     valid_top_lines = set([])
     j = 1
 
-    def _get_comp_left_dist(idx: int) -> int:
-        return abs(line.left - page.left_pos[idx][0])
+    def _get_x_dist(idx: int) -> int:
+        comp = page.lines[page.left_pos[idx][1]]
+        return abs(line.center_left - comp.center_left)
 
-    def _get_comp_top_dist(idx: int) -> int:
-        return abs(line.top - page.top_pos[idx][0])
+    def _get_y_dist(idx: int) -> int:
+        comp = page.lines[page.top_pos[idx][1]]
+        return abs(line.center_top - comp.center_top)
 
-    left_thres = norm_left_thres * page.text_width
-    top_thres = norm_top_thres * page.text_height
     while True:
-        lower_idx = left_idx - j
-        upper_idx = left_idx + j
+        lower_idx = x_idx - j
+        upper_idx = x_idx + j
         exceeded = True
         if (lower_idx > 0 and
-                _get_comp_left_dist(lower_idx) < left_thres):
-            valid_left_lines.add(page.left_pos[lower_idx][1])
+                _get_x_dist(lower_idx) < max_left_dist):
+            valid_left_lines.add(page.center_left_pos[lower_idx][1])
             exceeded = False
-        if (upper_idx < len(page.lines) and 
-                _get_comp_left_dist(upper_idx) < left_thres):
-            valid_left_lines.add(page.left_pos[upper_idx][1])
+        if (upper_idx < len(page.lines) and
+                _get_x_dist(upper_idx) < max_right_dist):
+            valid_left_lines.add(page.center_left_pos[upper_idx][1])
             exceeded = False
         if exceeded:
             break
@@ -238,16 +249,16 @@ def get_nearby_words(
 
     j = 1
     while True:
-        lower_idx = top_idx - j
-        upper_idx = top_idx + j
+        lower_idx = y_idx - j
+        upper_idx = y_idx + j
         exceeded = True
         if (lower_idx > 0 and
-                _get_comp_top_dist(lower_idx) < top_thres):
-            valid_top_lines.add(page.top_pos[lower_idx][1])
+                _get_y_dist(lower_idx) < max_top_dist):
+            valid_top_lines.add(page.center_top_pos[lower_idx][1])
             exceeded = False
         if (upper_idx < len(page.lines) and
-                _get_comp_top_dist(upper_idx) < top_thres):
-            valid_top_lines.add(page.top_pos[upper_idx][1])
+                _get_y_dist(upper_idx) < max_bottom_dist):
+            valid_top_lines.add(page.center_top_pos[upper_idx][1])
             exceeded = False
         if exceeded:
             break

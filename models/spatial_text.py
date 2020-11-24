@@ -270,22 +270,25 @@ class Page(SpatialText):
 
         self._left_pos: List[Tuple[int, int]]
         self._top_pos: List[Tuple[int, int]]
-        self._right_pos: List[Tuple[int, int]]
-        self._bottom_pos: List[Tuple[int, int]]
+
+        self._center_left_pos: List[Tuple[int, int]]
+        self._center_top_pos: List[Tuple[int, int]]
+
 
         line_pos = [
             ((line.left, i),
              (line.top, i),
-             (line.right, i),
-             (line.bottom, i))
+             (line.center_left, i),
+             (line.center_top, i)
+            )
             for i, line in enumerate(self._lines)
         ]
-        left_pos_t, top_pos_t, right_pos_t, bottom_pos_t = zip(*line_pos)
+        left_pos_t, top_pos_t, center_left_t, center_top_t = zip(*line_pos)
 
         self._left_pos = sorted(left_pos_t, key=lambda x: x[0])
         self._top_pos = sorted(top_pos_t, key=lambda x: x[0])
-        self._right_pos = sorted(right_pos_t, key=lambda x: x[0])
-        self._bottom_pos = sorted(bottom_pos_t, key=lambda x: x[0])
+        self._center_left_pos = sorted(center_left_t, key=lambda x: x[0])
+        self._center_top_pos = sorted(center_top_t, key=lambda x: x[0])
 
     def __getitem__(self, key: int) -> Line:
         return self._lines[key]
@@ -325,6 +328,14 @@ class Page(SpatialText):
     @property
     def top_pos(self) -> List[Tuple[int, int]]:
         return self._top_pos
+
+    @property
+    def center_left_pos(self) -> List[Tuple[int, int]]:
+        return self._center_left_pos
+
+    @property
+    def center_top_pos(self) -> List[Tuple[int, int]]:
+        return self._center_top_pos
 
     @property
     def text_width(self) -> int:

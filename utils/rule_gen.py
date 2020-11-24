@@ -20,6 +20,7 @@ def generate_query(
 ) -> Dict:
     if not nlp:
         nlp = spacy.load("en_core_web_sm")
+    wn_dist = _gen_word_neighbor_dist(pages)
     query = {
         "name": name,
         "arguments": {
@@ -27,8 +28,10 @@ def generate_query(
             "y-position": 0.0,
             "entity": None,
             "word-neighbors": [],
-            "word-neighbor-top-thres": 0.05,
-            "word-neighbor-left-thres": 0.1,
+            "word-neighbor-max-top-dist": wn_dist,
+            "word-neighbor-max-left-dist": wn_dist,
+            "word-neighbor-max-bottom-dist": wn_dist,
+            "word-neighbor-max-right-dist": wn_dist,
         },
         "weights": {
             "x-position": 0.25,
@@ -45,6 +48,13 @@ def generate_query(
         lines, pages)
     return query
 
+def _gen_word_neighbor_dist(
+    pages: List[Page],
+    multiplier: int = 3,
+) -> float:
+    all_lines = sum(page.lines for page in pages)
+    summed_line_heights = sum(line.height for line in all_lines)
+    return summed_line_heights / len(all_lines) * multiplier
 
 def _gen_entity(
     lines: List[Line],
@@ -85,18 +95,17 @@ def _gen_position(
 def _gen_word_neighbors(
     lines: List[Line],
     pages: List[Page],
-    top_thres: float = 0.05,
-    left_thres: float = 0.1,
+    max_top_dist: float,
+    max_left_dist: float,
+    max_bottom_dist: float,
+    max_right_dist: float
 ) -> List[str]:
     line_str_sets = []
     for i in range(len(lines)):
         line, page = lines[i], pages[i]
-        line_idxs = get_nearby_words(line, page, top_thres, left_thres)
-        line_strs = set(
-            itertools.chain(
-                *[str(page.lines[i]).split(' ')
-                  for i in line_idxs]
-            )
-        )
+        line_idxs = get_nearby_words(
+            line, page, max_top_dist, max_left_dist,
+            max_bottom_dist, max_right_dist)
+        line_strs = set([str(page.lines[i]) for i in line_idxs])
         line_str_sets.append(line_strs)
     return list(set.intersection(*line_str_sets))
