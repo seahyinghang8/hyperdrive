@@ -172,7 +172,7 @@ class ExtractionHeatmap extends React.Component {
                     'outline': '#066d10 dashed 3px'
                 },
                 'showTooltip': true,
-            },
+            }
         }
 
         const docLabels = this.props.labels[this.state.docIndex]
@@ -189,6 +189,7 @@ class ExtractionHeatmap extends React.Component {
                     'backgroundColor': `rgba(255, ${green}, 0, 0.4)`
                 }
                 if (line.text.includes(expected)) style['outline'] = '#066d10 dashed 3px'
+                if (lineScore.rank == 1) style['outline'] = "#000080 dashed 3px"
                 if (isSelected) style['border'] = '2px solid rgba(115, 146, 245, 0.9)'
 
                 lineStates[newState] = {
