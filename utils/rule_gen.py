@@ -45,14 +45,14 @@ def generate_query(
     query["arguments"]["x-position"] = x_pos
     query["arguments"]["y-position"] = y_pos
     query["arguments"]['word-neighbors'] = _gen_word_neighbors(
-        lines, pages)
+        lines, pages, wn_dist, wn_dist, wn_dist, wn_dist)
     return query
 
 def _gen_word_neighbor_dist(
     pages: List[Page],
     multiplier: int = 3,
 ) -> float:
-    all_lines = sum(page.lines for page in pages)
+    all_lines = list(itertools.chain(*[page.lines for page in pages]))
     summed_line_heights = sum(line.height for line in all_lines)
     return summed_line_heights / len(all_lines) * multiplier
 
