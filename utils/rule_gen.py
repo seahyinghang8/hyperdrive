@@ -52,7 +52,8 @@ def _gen_word_neighbor_dist(
     pages: List[Page],
     multiplier: int = 3,
 ) -> float:
-    all_lines = sum(page.lines for page in pages)
+    all_lines = list(
+        itertools.chain.from_iterable([page.lines for page in pages]))
     summed_line_heights = sum(line.height for line in all_lines)
     return summed_line_heights / len(all_lines) * multiplier
 
