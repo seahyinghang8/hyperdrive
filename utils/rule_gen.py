@@ -44,8 +44,8 @@ def generate_query(
     x_pos, y_pos = _gen_position(lines, pages)
     query["arguments"]["x-position"] = x_pos
     query["arguments"]["y-position"] = y_pos
-    # query["arguments"]['word-neighbors'] = _gen_word_neighbors(
-    #     lines, pages)
+    query["arguments"]['word-neighbors'] = _gen_word_neighbors(
+        lines, pages, wn_dist, wn_dist, wn_dist, wn_dist)
     return query
 
 def _gen_word_neighbor_dist(
