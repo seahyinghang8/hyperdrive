@@ -11,13 +11,12 @@ from pdfminer.layout import LTRect, LTLine, LTFigure
 
 from models.spatial_text import Line, Word, Page
 from models.document import Document
-from utils.img_preprocess import ocr_preprocess
+# from utils.img_preprocess import ocr_preprocess
 
 
 # Process image using Tesseract OCR to get a list of Lines
 def process_image(image: Image) -> List[Line]:
-    tesseract_out = pytesseract.image_to_data(
-        ocr_preprocess(image))
+    tesseract_out = pytesseract.image_to_data(image)
     return _parse_tesseract_data(tesseract_out)
 
 
