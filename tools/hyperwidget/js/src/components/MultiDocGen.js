@@ -92,15 +92,13 @@ class MultiDocGen extends React.Component {
                 'style': {
                     'backgroundColor': 'rgba(0, 0, 0, 0.1)'
                 },
-                'showTooltip': true,
-                'showText': false
+                'showTooltip': true
             },
             1: {
                 'style': {
                     'backgroundColor': 'rgba(115, 146, 245, 0.5)'
                 },
-                'showTooltip': true,
-                'showText': false
+                'showTooltip': true
             },
         }
 

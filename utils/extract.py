@@ -224,11 +224,11 @@ def get_nearby_words(
     j = 1
 
     def _get_x_dist(idx: int) -> int:
-        comp = page.lines[page.left_pos[idx][1]]
+        comp = page.lines[page.center_left_pos[idx][1]]
         return abs(line.center_left - comp.center_left)
 
     def _get_y_dist(idx: int) -> int:
-        comp = page.lines[page.top_pos[idx][1]]
+        comp = page.lines[page.center_top_pos[idx][1]]
         return abs(line.center_top - comp.center_top)
 
     while True:

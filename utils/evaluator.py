@@ -17,7 +17,10 @@ def evaluate_output(
             str(d[field][0].line) if field in d else ''
             for d in extracted_fields
         ]
-        labels = [str(d[field]) if field in d else '' for d in ground_truths]
+        labels = [
+            ' '.join(str(d[field]).split()) if field in d else ''
+            for d in ground_truths
+        ]
         mismatch = [
             (i, output, label)
             for i, (output, label) in enumerate(zip(outputs, labels))

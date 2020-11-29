@@ -18,14 +18,16 @@ class OCRVisualizer extends React.Component {
                     'backgroundColor': 'rgba(0, 0, 0, 0.1)'
                 },
                 'showTooltip': true,
-                'showText': true
+                'showText': true,
+                'showStats': true
             },
             1: {
                 'style': {
                     'backgroundColor': 'rgba(115, 146, 245, 0.5)'
                 },
                 'showTooltip': true,
-                'showText': true
+                'showText': true,
+                'showStats': true
             },
         }
         
@@ -67,9 +69,13 @@ class OCRVisualizer extends React.Component {
         if (showText) {
             this.lineStates[0]['showText'] = true
             this.lineStates[1]['showText'] = true
+            this.lineStates[0]['showStats'] = true
+            this.lineStates[1]['showStats'] = true
         } else {
             this.lineStates[0]['showText'] = false
             this.lineStates[1]['showText'] = false
+            this.lineStates[0]['showStats'] = false
+            this.lineStates[1]['showStats'] = false
         }
 
         return (<SpatialTextLayout

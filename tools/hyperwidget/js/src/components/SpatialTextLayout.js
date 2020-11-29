@@ -18,7 +18,15 @@ function SpatialTextLayout(props) {
                     const popover = lineState['popover']
                     const showPopover = popover !== undefined
                     let className = 'ocr-line'
-                    if (showTooltip) className += ' hyper-tooltip'
+                    let tooltipText = ''
+                    if (showTooltip) {
+                        className += ' hyper-tooltip'
+                        const showStats = lineState['showStats']
+                        if (showStats)
+                            tooltipText = ` left:${line.left + line.width / 2} | top:${line.top + line.height / 2}`
+                        else
+                            tooltipText = line.text
+                    }
                     if (showPopover) {
                         className += ' hyper-popover'
                         const xNorm = (line.left + line.width / 2) / props.page.width
@@ -33,6 +41,7 @@ function SpatialTextLayout(props) {
                             className += ' lock'
                         }
                     }
+
                     return (
                         <div 
                             style={getLinePosStyle(line, props.scale)}
@@ -40,7 +49,7 @@ function SpatialTextLayout(props) {
                             className={className}
                             key={idx}
                             line-index={idx}
-                            data-hyper-tooltip={line.text}
+                            data-hyper-tooltip={tooltipText}
                         >
                             <div
                                 style={getLineTextStyle(line, props.scale, lineStyle)}

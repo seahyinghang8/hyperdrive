@@ -44,8 +44,8 @@ def generate_query(
     x_pos, y_pos = _gen_position(lines, pages)
     query["arguments"]["x-position"] = x_pos
     query["arguments"]["y-position"] = y_pos
-    query["arguments"]['word-neighbors'] = _gen_word_neighbors(
-        lines, pages)
+    # query["arguments"]['word-neighbors'] = _gen_word_neighbors(
+    #     lines, pages)
     return query
 
 def _gen_word_neighbor_dist(
@@ -85,10 +85,10 @@ def _gen_position(
     pages: List[Page]
 ) -> Tuple[float, float]:
     x_pos = sum([
-        lines[i].center_left / pages[i].width for i in range(len(lines))
+        lines[i].center_left / pages[i].text_width for i in range(len(lines))
     ])
     y_pos = sum([
-        lines[i].center_top / pages[i].height for i in range(len(lines))
+        lines[i].center_top / pages[i].text_height for i in range(len(lines))
     ])
     return (x_pos / len(pages), y_pos / len(pages))
 
