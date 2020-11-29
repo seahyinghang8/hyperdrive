@@ -235,7 +235,7 @@ def get_nearby_words(
         lower_idx = x_idx - j
         upper_idx = x_idx + j
         exceeded = True
-        if (lower_idx > 0 and
+        if (lower_idx >= 0 and
                 _get_x_dist(lower_idx) < max_left_dist):
             valid_left_lines.add(page.center_left_pos[lower_idx][1])
             exceeded = False
@@ -252,7 +252,7 @@ def get_nearby_words(
         lower_idx = y_idx - j
         upper_idx = y_idx + j
         exceeded = True
-        if (lower_idx > 0 and
+        if (lower_idx >= 0 and
                 _get_y_dist(lower_idx) < max_top_dist):
             valid_top_lines.add(page.center_top_pos[lower_idx][1])
             exceeded = False
