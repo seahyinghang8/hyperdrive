@@ -1,0 +1,147 @@
+- arguments:
+    entity: EIN
+    word-neighbor-max-bottom-dist: 0
+    word-neighbor-max-left-dist: 15
+    word-neighbor-max-right-dist: 0
+    word-neighbor-max-top-dist: 13
+    word-neighbors:
+    - Employer Identification Number
+    x-position: 0.1
+    y-position: 0.05
+  name: EIN
+  weights:
+    entity: 0.25
+    word-neighbors: 0.25
+    x-position: 0.25
+    y-position: 0.25
+- arguments:
+    entity: ''
+    word-neighbor-max-bottom-dist: 0
+    word-neighbor-max-left-dist: 150
+    word-neighbor-max-right-dist: 0
+    word-neighbor-max-top-dist: 15
+    word-neighbors:
+    - Employer's name, address, and ZIP code
+    x-position: 0.22
+    y-position: 0.09
+  name: Employer's Name
+  weights:
+    entity: 0.0
+    word-neighbors: 0.33
+    x-position: 0.33
+    y-position: 0.33
+- arguments:
+    entity: ''
+    word-neighbor-max-bottom-dist: 50
+    word-neighbor-max-left-dist: 150
+    word-neighbor-max-right-dist: 0
+    word-neighbor-max-top-dist: 30
+    word-neighbors:
+    - Control number
+    - Employer's name, address, and ZIP code
+    x-position: 0.22
+    y-position: 0.16
+  name: Employer's Street Address
+  weights:
+    entity: 0.0
+    word-neighbors: 0.45
+    x-position: 0.25
+    y-position: 0.3
+- arguments:
+    entity: ''
+    word-neighbor-max-bottom-dist: 30
+    word-neighbor-max-left-dist: 150
+    word-neighbor-max-right-dist: 0
+    word-neighbor-max-top-dist: 50
+    word-neighbors:
+    - Control number
+    - Employer's name, address, and ZIP code
+    x-position: 0.22
+    y-position: 0.2
+  name: Employer's City-State-Zip
+  weights:
+    entity: 0.0
+    word-neighbors: 0.45
+    x-position: 0.25
+    y-position: 0.3
+- arguments:
+    entity: SSN
+    word-neighbor-max-bottom-dist: 0
+    word-neighbor-max-left-dist: 30
+    word-neighbor-max-right-dist: 0
+    word-neighbor-max-top-dist: 20
+    word-neighbors:
+    - Employee's social security number
+    x-position: 0.36
+    y-position: 0.08
+  name: Employee Social Security Number
+  weights:
+    entity: 0.25
+    word-neighbors: 0.25
+    x-position: 0.25
+    y-position: 0.25
+- arguments:
+    entity: DOLLAR_AMOUNT
+    word-neighbor-max-bottom-dist: 0
+    word-neighbor-max-left-dist: 15
+    word-neighbor-max-right-dist: 10
+    word-neighbor-max-top-dist: 20
+    word-neighbors:
+    - Social security wages
+    x-position: 0.66
+    y-position: 0.09
+  name: Social Security Wages
+  weights:
+    entity: 0.25
+    word-neighbors: 0.25
+    x-position: 0.25
+    y-position: 0.25
+- arguments:
+    entity: DOLLAR_AMOUNT
+    word-neighbor-max-bottom-dist: 0
+    word-neighbor-max-left-dist: 20
+    word-neighbor-max-right-dist: 20
+    word-neighbor-max-top-dist: 20
+    word-neighbors:
+    - Medicare tax withheld
+    x-position: 0.88
+    y-position: 0.12
+  name: Medicare Tax Withheld
+  weights:
+    entity: 0.25
+    word-neighbors: 0.25
+    x-position: 0.25
+    y-position: 0.25
+- arguments:
+    entity: ''
+    word-neighbor-max-bottom-dist: 0
+    word-neighbor-max-left-dist: 10
+    word-neighbor-max-right-dist: 0
+    word-neighbor-max-top-dist: 20
+    word-neighbors:
+    - Locality name
+    x-position: 0.96
+    y-position: 0.37
+  name: Locality Name_1
+  weights:
+    entity: 0.0
+    word-neighbors: 0.33
+    x-position: 0.33
+    y-position: 0.33
+- arguments:
+    entity: ''
+    word-neighbor-max-bottom-dist: 20
+    word-neighbor-max-left-dist: 70
+    word-neighbor-max-right-dist: 0
+    word-neighbor-max-top-dist: 40
+    word-neighbors:
+    - Locality name
+    - Department of the Treasury--Internal Revenue Service
+    x-position: 0.96
+    y-position: 0.4
+  name: Locality Name_2
+  weights:
+    entity: 0.0
+    word-neighbors: 0.5
+    x-position: 0.25
+    y-position: 0.25

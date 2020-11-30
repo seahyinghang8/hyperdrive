@@ -1,0 +1,7 @@
+data_dir: data/full/w2/train/single
+label_path: data/full/w2/train/single_label.csv
+queries_path: configs/single_queries.yaml
+error_path: logs/single_nei_off_error.yaml
+neighbor_off: true
+position_off: false
+entity_off: false
