@@ -1,0 +1,7 @@
+data_dir: data/full/receipt/train/image
+label_path: data/full/receipt/train/label.csv
+queries_path: configs/receipt_queries.yaml
+error_path: logs/receipts_base_error.yaml
+neighbor_off: false
+position_off: false
+entity_off: false

@@ -1,0 +1,17 @@
+- arguments:
+    entity: CARDINAL
+    word-neighbor-max-bottom-dist: 15
+    word-neighbor-max-left-dist: 400
+    word-neighbor-max-right-dist: 0
+    word-neighbor-max-top-dist: 15
+    word-neighbors:
+    - Total
+    - Payable
+    x-position: 0.7
+    y-position: 0.7
+  name: total
+  weights:
+    entity: 0.15
+    word-neighbors: 0.5
+    x-position: 0.1
+    y-position: 0.25
