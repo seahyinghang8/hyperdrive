@@ -36,7 +36,7 @@ if cfg["neighbor_off"]:
 
 fields = [f["name"] for f in field_queries]
 
-num_docs = 2#len(dl)
+num_docs = len(dl)
 extracted_fields = par_for(
     lambda i: extract_fields(dl.get_document(i), field_queries, 1000, nlp),
     list(range(num_docs)),
