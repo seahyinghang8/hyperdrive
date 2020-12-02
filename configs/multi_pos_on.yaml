@@ -1,0 +1,7 @@
+data_dir: data/full/w2/train/multi
+label_path: data/full/w2/train/multi_label.csv
+queries_path: configs/multi_queries.yaml
+error_path: logs/multi_pos_on_error.yaml
+neighbor_off: true
+position_off: false
+entity_off: true
